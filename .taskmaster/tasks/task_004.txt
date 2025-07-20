@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Implement Pulsing Animation with React Native Reanimated
+# Status: pending
+# Dependencies: 3
+# Priority: medium
+# Description: Create smooth breathing/pulsing animation effect using react-native-reanimated for 60fps performance
+# Details:
+Design animations using react-native-reanimated useSharedValue and useAnimatedStyle hooks. Implement pulsing effect using transform scale and shadow intensity changes with withRepeat and withTiming. Use Easing curves (Easing.inOut) for natural movement. Set animation to infinite loop with configurable duration. Ensure 60fps performance by running animations on the UI thread with useNativeDriver equivalent.
+
+# Test Strategy:
+Verify animation runs smoothly at 60fps on both iOS and Android. Test animation timing and easing feels natural. Monitor performance using React Native performance tools. Test on physical devices, especially mid-range Android phones.

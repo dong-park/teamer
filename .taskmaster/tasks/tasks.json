@@ -1,0 +1,185 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Structure and Dependencies",
+        "description": "Verify React Native project structure and development environment for the ambient light start button component",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "Verify existing React Native project setup with App.tsx and components/StartButton.tsx. Confirm NativeWind (Tailwind CSS) configuration is working properly. Validate that required animation libraries are installed and functional: react-native-reanimated, react-native-skia, react-native-linear-gradient, and lottie-react-native. Test development environment with Metro bundler and ensure project runs on iOS/Android simulators. Verify TypeScript configuration and global.css setup.",
+        "testStrategy": "Run 'npm start' to verify Metro bundler starts successfully. Test 'npm run ios' and 'npm run android' to ensure app launches properly. Verify existing StartButton component renders without errors. Check that NativeWind classes apply correctly. Validate no missing dependencies or configuration issues.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify Metro bundler and development servers",
+            "description": "Test that the React Native development environment starts correctly [Updated: 2025. 7. 20.]",
+            "status": "done",
+            "dependencies": [],
+            "details": "<info added on 2025-07-20T02:48:09.935Z>\nMetro bundler confirmed running successfully - Welcome to Metro v0.82.5 message verified, development server active on http://localhost:8081\n</info added on 2025-07-20T02:48:09.935Z>",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Validate existing components structure",
+            "description": "Confirm App.tsx and StartButton.tsx are properly set up and rendering",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Test NativeWind configuration",
+            "description": "Verify Tailwind CSS classes work properly with NativeWind setup",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Confirm animation libraries installation",
+            "description": "Validate react-native-reanimated, react-native-skia, react-native-linear-gradient are installed and linked",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Test iOS and Android compatibility",
+            "description": "Ensure project runs successfully on both iOS simulator and Android emulator",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Implement Base Button Styling with React Native",
+        "description": "Create the fundamental styling for the start button using React Native components, NativeWind, and proper dimensions",
+        "details": "Define button dimensions, padding, borderRadius using React Native StyleSheet and NativeWind classes. Implement proper TouchableOpacity with feedback. Set up base background color, text styling using React Native Text component. Ensure button meets accessibility standards with proper contrast ratios and accessibilityLabel/accessibilityRole props. Apply consistent typography and spacing using NativeWind Tailwind classes.",
+        "testStrategy": "Verify button appears correctly sized and styled on both iOS and Android. Test touch feedback and haptics. Validate color contrast meets WCAG guidelines. Test across different screen sizes and device orientations.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Create Multi-Layer Glow Effect System with React Native",
+        "description": "Implement the core ambient light glow effect using React Native shadow properties, linear gradients, and layered views",
+        "details": "Create multiple layered View components with React Native shadow properties (shadowOffset, shadowOpacity, shadowRadius, shadowColor for iOS and elevation for Android). Implement react-native-linear-gradient for smooth gradient transitions. Use multiple positioned views for complex layering effect. Consider react-native-skia for advanced gradient effects if needed. Implement props for glow color, intensity, and radius customization.",
+        "testStrategy": "Verify glow effect appears with proper depth and diffusion on both iOS and Android (noting platform differences). Test glow visibility against different backgrounds. Validate no performance issues with multiple layered views and gradients.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Implement Pulsing Animation with React Native Reanimated",
+        "description": "Create smooth breathing/pulsing animation effect using react-native-reanimated for 60fps performance",
+        "details": "Design animations using react-native-reanimated useSharedValue and useAnimatedStyle hooks. Implement pulsing effect using transform scale and shadow intensity changes with withRepeat and withTiming. Use Easing curves (Easing.inOut) for natural movement. Set animation to infinite loop with configurable duration. Ensure 60fps performance by running animations on the UI thread with useNativeDriver equivalent.",
+        "testStrategy": "Verify animation runs smoothly at 60fps on both iOS and Android. Test animation timing and easing feels natural. Monitor performance using React Native performance tools. Test on physical devices, especially mid-range Android phones.",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "in-progress",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Add Interactive Touch States for React Native",
+        "description": "Implement enhanced glow effects for user interactions including onPress, onPressIn, onPressOut states",
+        "details": "Create intensified glow on onPressIn with faster pulse rate using react-native-reanimated. Implement onPressOut state with brief flash effect and ripple animation from touch point. Add proper TouchableOpacity feedback and haptic feedback using react-native-haptic-feedback. Use react-native-reanimated for smooth state transitions. Implement color shift options for press states.",
+        "testStrategy": "Test all interactive states work correctly on both platforms. Verify smooth transitions between states. Test haptic feedback on supported devices. Validate touch interactions feel responsive and natural on mobile devices.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement Configuration System with TypeScript Props",
+        "description": "Create TypeScript interface-based configuration system for customizable glow parameters and animation settings",
+        "details": "Develop TypeScript interface for configuration props with properties: glowIntensity (0-100%), animationSpeed (slow/medium/fast), glowRadius, color values, and enable/disable toggles. Implement React Native component props system for real-time configuration. Create methods to apply configurations dynamically using react-native-reanimated shared values.",
+        "testStrategy": "Test all configuration parameters update the visual effect correctly on both platforms. Verify real-time prop changes work smoothly. Test edge cases with extreme values. Validate TypeScript type safety and prop validation.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Create Preset System and Dark Mode Support",
+        "description": "Implement predefined glow presets and React Native dark mode compatibility using NativeWind",
+        "details": "Create preset configurations: subtle (professional), medium (balanced), intense (gaming/entertainment). Implement dark mode detection using React Native Appearance API and NativeWind dark mode classes. Create theme-switching functionality with NativeWind dark: prefixes. Ensure brand color integration support with custom color props. Handle iOS/Android system theme changes automatically.",
+        "testStrategy": "Test all presets apply correctly and look appropriate on both platforms. Verify dark mode detection works with system settings. Test theme switching is smooth. Validate colors work well in both light and dark themes across iOS and Android.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Disabled State and React Native Accessibility",
+        "description": "Add disabled button state with reduced glow and comprehensive React Native accessibility support",
+        "details": "Implement disabled prop with dimmed appearance and reduced/no glow effect. Add React Native accessibility properties: accessibilityLabel, accessibilityRole, accessibilityState. Ensure proper screen reader support for iOS VoiceOver and Android TalkBack. Implement reduced motion support using react-native-reanimated reduceMotion. Add high contrast mode support using React Native AccessibilityInfo.",
+        "testStrategy": "Test disabled state visual appearance and functionality on both platforms. Verify VoiceOver and TalkBack compatibility. Test accessibility navigation thoroughly. Validate reduced motion preferences are respected on iOS and Android.",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Cross-Platform Optimization for iOS and Android",
+        "description": "Ensure optimal performance and appearance across iOS and Android platforms with platform-specific adjustments",
+        "details": "Test and optimize for iOS and Android platform differences in shadow rendering, gradient performance, and animation behavior. Implement Platform.select() for platform-specific styles where needed. Optimize shadow properties (iOS uses shadowOffset/shadowRadius, Android uses elevation). Handle performance differences between platforms. Add conditional rendering for platform-specific features.",
+        "testStrategy": "Test functionality across iOS and Android versions and devices. Verify platform-specific optimizations work appropriately. Test on various physical devices including older models. Validate consistent visual appearance accounting for platform differences.",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Performance Optimization and React Native Testing",
+        "description": "Optimize for 60fps animation performance and conduct comprehensive testing across iOS and Android devices",
+        "details": "Optimize React Native animations using react-native-reanimated runOnUI, useNativeDriver equivalent features. Minimize JavaScript bridge calls during animations. Test performance on low-end Android devices and older iOS devices. Implement performance monitoring using React Native performance tools. Create comprehensive test suite using Jest for component logic and manual testing for visual effects.",
+        "testStrategy": "Monitor and verify 60fps performance across iOS and Android devices. Test CPU/GPU usage using Xcode Instruments and Android profiler. Conduct user acceptance testing on physical devices. Verify all acceptance criteria are met. Test edge cases and performance under various device conditions.",
+        "priority": "high",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-20T02:25:49.784Z",
+      "updated": "2025-07-20T03:05:47.981Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 커스텀 컴포넌트 클래스들 */
+@layer components {
+  .title-text {
+    @apply text-2xl font-bold text-black dark:text-white;
+  }
+  
+  .primary-button {
+    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+  }
+  
+  .toggle-container {
+    @apply flex-row items-center mb-6;
+  }
+  
+  .dark-mode-label {
+    @apply text-lg font-bold mr-2 text-black dark:text-white;
+  }
+
+  /* 플레이 버튼 스타일 (애니메이션 제거) */
+  .play-button {
+    @apply w-24 h-24 rounded-full border-4 border-blue-500 dark:border-blue-400 
+           justify-center items-center bg-transparent;
+  }
+  
+  .play-button-active {
+    @apply w-24 h-24 rounded-full border-4 border-blue-500 dark:border-blue-400 
+           justify-center items-center bg-blue-500/10 dark:bg-blue-400/10;
+  }
+  
+  .play-triangle {
+    @apply text-blue-500 dark:text-blue-400 text-4xl;
+  }
+}

@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Cross-Platform Optimization for iOS and Android
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Ensure optimal performance and appearance across iOS and Android platforms with platform-specific adjustments
+# Details:
+Test and optimize for iOS and Android platform differences in shadow rendering, gradient performance, and animation behavior. Implement Platform.select() for platform-specific styles where needed. Optimize shadow properties (iOS uses shadowOffset/shadowRadius, Android uses elevation). Handle performance differences between platforms. Add conditional rendering for platform-specific features.
+
+# Test Strategy:
+Test functionality across iOS and Android versions and devices. Verify platform-specific optimizations work appropriately. Test on various physical devices including older models. Validate consistent visual appearance accounting for platform differences.

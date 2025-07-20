@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Create Multi-Layer Glow Effect System with React Native
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Implement the core ambient light glow effect using React Native shadow properties, linear gradients, and layered views
+# Details:
+Create multiple layered View components with React Native shadow properties (shadowOffset, shadowOpacity, shadowRadius, shadowColor for iOS and elevation for Android). Implement react-native-linear-gradient for smooth gradient transitions. Use multiple positioned views for complex layering effect. Consider react-native-skia for advanced gradient effects if needed. Implement props for glow color, intensity, and radius customization.
+
+# Test Strategy:
+Verify glow effect appears with proper depth and diffusion on both iOS and Android (noting platform differences). Test glow visibility against different backgrounds. Validate no performance issues with multiple layered views and gradients.

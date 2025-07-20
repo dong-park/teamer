@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Create Preset System and Dark Mode Support
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Implement predefined glow presets and React Native dark mode compatibility using NativeWind
+# Details:
+Create preset configurations: subtle (professional), medium (balanced), intense (gaming/entertainment). Implement dark mode detection using React Native Appearance API and NativeWind dark mode classes. Create theme-switching functionality with NativeWind dark: prefixes. Ensure brand color integration support with custom color props. Handle iOS/Android system theme changes automatically.
+
+# Test Strategy:
+Test all presets apply correctly and look appropriate on both platforms. Verify dark mode detection works with system settings. Test theme switching is smooth. Validate colors work well in both light and dark themes across iOS and Android.
