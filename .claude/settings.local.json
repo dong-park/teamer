@@ -18,7 +18,8 @@
       "mcp__serena__get_current_config",
       "mcp__serena__find_file",
       "Bash(npm install:*)",
-      "Bash(bundle exec pod:*)"
+      "Bash(bundle exec pod:*)",
+      "mcp__serena__replace_symbol_body"
     ]
   },
   "enableAllProjectMcpServers": true,

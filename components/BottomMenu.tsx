@@ -8,36 +8,28 @@ interface BottomMenuProps {
 
 const BottomMenu: React.FC<BottomMenuProps> = ({ activeIndex, onTabPress }) => {
   const tabs = [
-    { id: 0, icon: '📊', label: '집중 시간' },
-    { id: 1, icon: '🏠', label: '홈' },
-    { id: 2, icon: '👥', label: '그룹' },
+    { id: 0, symbol: '◗', label: '시간' },
+    { id: 1, symbol: '●', label: '홈' },
+    { id: 2, symbol: '◯', label: '그룹' },
   ];
 
   return (
-    <View className="flex-row bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-2">
+    <View className="flex-row bg-white/0 dark:bg-gray-900/0 py-6 px-8">
       {tabs.map((tab) => (
         <TouchableOpacity
           key={tab.id}
-          className="flex-1 items-center py-2"
+          className="flex-1 items-center"
           onPress={() => onTabPress(tab.id)}
+          activeOpacity={0.7}
         >
           <Text 
-            className={`text-2xl mb-1 ${
+            className={`text-2xl ${
               activeIndex === tab.id 
-                ? 'opacity-100' 
-                : 'opacity-50'
+                ? 'text-gray-900 dark:text-white' 
+                : 'text-gray-400 dark:text-gray-600'
             }`}
           >
-            {tab.icon}
-          </Text>
-          <Text 
-            className={`text-xs ${
-              activeIndex === tab.id 
-                ? 'text-blue-600 dark:text-blue-400 font-medium' 
-                : 'text-gray-500 dark:text-gray-400'
-            }`}
-          >
-            {tab.label}
+            {tab.symbol}
           </Text>
         </TouchableOpacity>
       ))}
