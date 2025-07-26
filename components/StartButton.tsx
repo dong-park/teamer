@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, useColorScheme, Vibration, Platform } from 'react-native';
 import { Canvas, Circle, vec, RadialGradient } from '@shopify/react-native-skia';
-import { useSharedValue, withTiming, Easing, cancelAnimation, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { useSharedValue, withTiming, Easing, cancelAnimation, useAnimatedStyle, withSpring, useAnimatedReaction, runOnJS } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
 import { ParticleRenderer } from './AmbientEffect/effects/ParticleRenderer';
 import { useAdaptiveConfig } from './AmbientEffect/hooks/useAdaptiveConfig';
@@ -138,11 +138,14 @@ const StartButton: React.FC<StartButtonProps> = ({
 }) => {
   const [isStarted, setIsStarted] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
+  const [currentIntensity, setCurrentIntensity] = useState(0);
+  const [currentOpacity, setCurrentOpacity] = useState(0);
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const glowOpacity = useSharedValue(0);
   const pressScale = useSharedValue(1);
   const pressOpacity = useSharedValue(1);
+
 
   // Get current color theme based on preset or custom colors and color scheme
   const baseColors = colorPreset === 'custom' && customColors ? customColors : colorPresets[colorPreset];
@@ -166,6 +169,15 @@ const StartButton: React.FC<StartButtonProps> = ({
       intensity: glowIntensity,
     }
   });
+
+  // glowOpacity 값 변화를 추적하여 currentIntensity와 currentOpacity 업데이트
+  useAnimatedReaction(
+    () => glowOpacity.value,
+    (opacity) => {
+      runOnJS(setCurrentIntensity)(adaptiveConfig.intensity * opacity);
+      runOnJS(setCurrentOpacity)(opacity);
+    }
+  );
 
   // 성능 변화 감지 핸들러
   const handlePerformanceChange = (isGood: boolean) => {
@@ -253,7 +265,7 @@ const StartButton: React.FC<StartButtonProps> = ({
           width={280}
           height={280}
           pattern={adaptiveConfig.pattern || particlePattern}
-          intensity={adaptiveConfig.intensity * glowOpacity.value}
+          intensity={currentIntensity}
           isActive={isStarted}
           quality={adaptiveConfig.quality}
           particleCount={adaptiveConfig.particleCount}
@@ -272,7 +284,7 @@ const StartButton: React.FC<StartButtonProps> = ({
               cx={140}
               cy={140}
               r={100 * glowRadius}
-              opacity={glowOpacity}
+              opacity={currentOpacity}
             >
               <RadialGradient
                 c={vec(140, 140)}
@@ -291,7 +303,7 @@ const StartButton: React.FC<StartButtonProps> = ({
               cx={140}
               cy={140}
               r={65 * glowRadius}
-              opacity={glowOpacity}
+              opacity={currentOpacity}
             >
               <RadialGradient
                 c={vec(140, 140)}
@@ -310,7 +322,7 @@ const StartButton: React.FC<StartButtonProps> = ({
               cx={140}
               cy={140}
               r={50 * glowRadius}
-              opacity={glowOpacity}
+              opacity={currentOpacity}
             >
               <RadialGradient
                 c={vec(140, 140)}
@@ -332,7 +344,7 @@ const StartButton: React.FC<StartButtonProps> = ({
               cx={140}
               cy={140}
               r={100 * glowRadius}
-              opacity={glowOpacity}
+              opacity={currentOpacity}
             >
               <RadialGradient
                 c={vec(140, 140)}

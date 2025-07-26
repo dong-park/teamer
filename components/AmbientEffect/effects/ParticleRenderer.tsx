@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import { Canvas, Circle, Group } from '@shopify/react-native-skia';
-import { useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
+
 import { ParticleSystem } from '../utils/particleSystem';
 import { Particle, EffectPattern, Quality } from '../types';
 import { detectDeviceCapability, getOptimalConfig, PerformanceMonitor } from '../utils/deviceDetection';
@@ -27,6 +27,7 @@ export const ParticleRenderer: React.FC<ParticleRendererProps> = ({
   particleCount,
   onPerformanceChange,
 }) => {
+  const [animationOpacity, setAnimationOpacity] = useState(0);
   // 성능 관련 상태
   const deviceCapability = useMemo(() => detectDeviceCapability(), []);
   const optimalConfig = useMemo(() => getOptimalConfig(deviceCapability), [deviceCapability]);
@@ -38,9 +39,7 @@ export const ParticleRenderer: React.FC<ParticleRendererProps> = ({
     return new ParticleSystem(count, width, height, pattern);
   }, [width, height, pattern, particleCount, optimalConfig.particleCount]);
 
-  // 애니메이션 값
-  const animationProgress = useSharedValue(0);
-  const lastFrameTime = useSharedValue(0);
+
 
   // 품질별 설정 계산
   const qualitySettings = useMemo(() => {
@@ -82,16 +81,19 @@ export const ParticleRenderer: React.FC<ParticleRendererProps> = ({
     }
   }, [quality, optimalConfig.quality]);
 
+  // 현재 시간 추적을 위한 일반 변수
+  let lastTime = 0;
+
   // 파티클 상태 업데이트
   const updateParticles = useCallback((currentTime: number) => {
-    const deltaTime = lastFrameTime.value === 0 ? 16 : currentTime - lastFrameTime.value;
-    lastFrameTime.value = currentTime;
+    const deltaTime = lastTime === 0 ? 16 : currentTime - lastTime;
+    lastTime = currentTime;
 
     // 성능 측정
     const isPerformanceGood = performanceMonitor.measureFrame();
     
     if (!isPerformanceGood && onPerformanceChange) {
-      runOnJS(onPerformanceChange)(false);
+      onPerformanceChange(false);
     }
 
     // 파티클 시스템 업데이트
@@ -103,26 +105,30 @@ export const ParticleRenderer: React.FC<ParticleRendererProps> = ({
         requestAnimationFrame(updateParticles);
       }, qualitySettings.updateInterval);
     }
-  }, [lastFrameTime, performanceMonitor, onPerformanceChange, particleSystem, intensity, isActive, qualitySettings.updateInterval]);
+  }, [performanceMonitor, onPerformanceChange, particleSystem, intensity, isActive, qualitySettings.updateInterval]);
 
   // 파티클 시스템 생명주기 관리
   useEffect(() => {
     if (isActive) {
       particleSystem.start();
       performanceMonitor.startMonitoring();
-      animationProgress.value = withTiming(1, { duration: 500 });
       requestAnimationFrame(updateParticles);
+      
+      // Fade in animation
+      setTimeout(() => setAnimationOpacity(1), 100);
     } else {
       particleSystem.stop();
       performanceMonitor.stopMonitoring();
-      animationProgress.value = withTiming(0, { duration: 300 });
+      
+      // Fade out animation
+      setAnimationOpacity(0);
     }
 
     return () => {
       particleSystem.dispose();
       performanceMonitor.stopMonitoring();
     };
-  }, [isActive, animationProgress, particleSystem, performanceMonitor, updateParticles]);
+  }, [isActive, particleSystem, performanceMonitor, updateParticles]);
 
   // 패턴 변경 시 파티클 시스템 업데이트
   useEffect(() => {
@@ -131,7 +137,7 @@ export const ParticleRenderer: React.FC<ParticleRendererProps> = ({
 
   // 파티클 렌더링 컴포넌트
   const renderParticle = (particle: Particle, index: number) => {
-    const alpha = particle.opacity * animationProgress.value * intensity;
+    const alpha = particle.opacity * intensity * animationOpacity;
     
     return (
       <Circle
