@@ -19,7 +19,10 @@
       "mcp__serena__find_file",
       "Bash(npm install:*)",
       "Bash(bundle exec pod:*)",
-      "mcp__serena__replace_symbol_body"
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__read_memory",
+      "mcp__serena__think_about_whether_you_are_done",
+      "mcp__serena__summarize_changes"
     ]
   },
   "enableAllProjectMcpServers": true,

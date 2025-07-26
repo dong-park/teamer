@@ -14,10 +14,10 @@ import FocusTimeScreen from './components/screens/FocusTimeScreen';
 import HomeScreen from './components/screens/HomeScreen';
 import GroupTrackerScreen from './components/screens/GroupTrackerScreen';
 import BottomMenu from './components/BottomMenu';
+import { TimerContext, useTimerLogic, TimerContextType } from './hooks/useTimer';
 
-
-
-
+// Re-export useTimer for backward compatibility
+export { useTimer } from './hooks/useTimer';
 function App() {
   // 시스템 다크모드 상태를 가져옵니다
   const systemIsDarkMode = useRNColorScheme() === 'dark';
@@ -27,6 +27,11 @@ function App() {
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentPage, setCurrentPage] = useState(1); // 홈 화면을 기본으로
   const screenWidth = Dimensions.get('window').width;
+
+  // 타이머 로직 사용
+  const timerLogic = useTimerLogic();
+
+
 
   // 시스템 다크모드 상태가 변경될 때 NativeWind에 알림
   useEffect(() => {
@@ -52,10 +57,14 @@ function App() {
     setCurrentPage(pageIndex);
   };
 
+  // Timer context value
+  const timerContextValue: TimerContextType = timerLogic;
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor }]}>
-      <View style={styles.container}>
-        <ScrollView
+    <TimerContext.Provider value={timerContextValue}>
+      <SafeAreaView style={[styles.container, { backgroundColor }]}>
+        <View style={styles.container}>
+          <ScrollView
           ref={scrollViewRef}
           horizontal
           pagingEnabled
@@ -81,6 +90,7 @@ function App() {
         />
       </View>
     </SafeAreaView>
+    </TimerContext.Provider>
   );
 }
 
