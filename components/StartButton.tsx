@@ -72,6 +72,50 @@ const colorPresets: Record<ColorPreset, ColorTheme> = {
   }
 };
 
+// 라이트 모드용 세련된 색상 프리셋 (미적 매력도를 높인 색상)
+const lightModeColorPresets: Record<ColorPreset, ColorTheme> = {
+  electric: {
+    primary: '#2563EB',    // Modern Electric Blue
+    secondary: '#1D4ED8',  // Rich Blue
+    accent: '#3B82F6'      // Bright Blue
+  },
+  fire: {
+    primary: '#DC2626',    // Modern Red
+    secondary: '#B91C1C',  // Deep Red
+    accent: '#EF4444'      // Bright Red
+  },
+  ocean: {
+    primary: '#0891B2',    // Modern Cyan
+    secondary: '#0E7490',  // Deep Cyan
+    accent: '#06B6D4'      // Bright Cyan
+  },
+  forest: {
+    primary: '#059669',    // Modern Green
+    secondary: '#047857',  // Deep Green
+    accent: '#10B981'      // Bright Green
+  },
+  sunset: {
+    primary: '#DB2777',    // Modern Pink
+    secondary: '#BE185D',  // Deep Pink
+    accent: '#EC4899'      // Bright Pink
+  },
+  neon: {
+    primary: '#CA8A04',    // Modern Yellow
+    secondary: '#A16207',  // Deep Yellow
+    accent: '#EAB308'      // Bright Yellow
+  },
+  royal: {
+    primary: '#7C3AED',    // Modern Purple
+    secondary: '#6D28D9',  // Deep Purple
+    accent: '#8B5CF6'      // Bright Purple
+  },
+  custom: {
+    primary: '#DC2626',    // Modern fallback
+    secondary: '#B91C1C',
+    accent: '#EF4444'
+  }
+};
+
 const StartButton: React.FC<StartButtonProps> = ({
   colorPreset = 'electric',
   customColors,
@@ -92,8 +136,12 @@ const StartButton: React.FC<StartButtonProps> = ({
   const pressOpacity = useSharedValue(1);
   
 
-  // Get current color theme based on preset or custom colors
-  const currentColors = colorPreset === 'custom' && customColors ? customColors : colorPresets[colorPreset];
+  // Get current color theme based on preset or custom colors and color scheme
+  const baseColors = colorPreset === 'custom' && customColors ? customColors : colorPresets[colorPreset];
+  const lightColors = lightModeColorPresets[colorPreset];
+  
+  // 라이트 모드에서는 어두운 색상 사용, 다크 모드에서는 밝은 색상 사용
+  const currentColors = isDarkMode ? baseColors : lightColors;
   const primaryColor = currentColors.primary;
   const secondaryColor = currentColors.secondary;
   const accentColor = currentColors.accent;
@@ -172,68 +220,96 @@ const StartButton: React.FC<StartButtonProps> = ({
   return (
     <View style={styles.container}>
       <Canvas style={styles.canvas}>
-        {/* Outer glow layer - largest, most diffused */}
-        <Circle
-          cx={140}
-          cy={140}
-          r={isDarkMode ? (100 * glowRadius) : (80 * glowRadius)}
-          opacity={glowOpacity}
-        >
-          <RadialGradient
-            c={vec(140, 140)}
-            r={isDarkMode ? (100 * glowRadius) : (80 * glowRadius)}
-            colors={isDarkMode ? 
-              [primaryColor + Math.round(0xCC * glowIntensity).toString(16).padStart(2, '0'), 
-               primaryColor + Math.round(0x88 * glowIntensity).toString(16).padStart(2, '0'), 
-               'transparent'] : 
-              [primaryColor + Math.round(0x77 * glowIntensity).toString(16).padStart(2, '0'), 
-               primaryColor + Math.round(0x44 * glowIntensity).toString(16).padStart(2, '0'), 
-               'transparent']}
-            positions={isDarkMode ? [0.1, 0.5, 1.0] : [0.1, 0.6, 1.0]}
-          />
-        </Circle>
-        
-        {/* Inner glow layer - brightest, most focused */}
-        <Circle
-          cx={140}
-          cy={140}
-          r={isDarkMode ? (65 * glowRadius) : (55 * glowRadius)}
-          opacity={glowOpacity}
-        >
-          <RadialGradient
-            c={vec(140, 140)}
-            r={isDarkMode ? (65 * glowRadius) : (55 * glowRadius)}
-            colors={isDarkMode ? 
-              [secondaryColor + Math.round(0xFF * glowIntensity).toString(16).padStart(2, '0'), 
-               secondaryColor + Math.round(0xBB * glowIntensity).toString(16).padStart(2, '0'), 
-               'transparent'] : 
-              [secondaryColor + Math.round(0x99 * glowIntensity).toString(16).padStart(2, '0'), 
-               secondaryColor + Math.round(0x55 * glowIntensity).toString(16).padStart(2, '0'), 
-               'transparent']}
-            positions={isDarkMode ? [0.2, 0.6, 1.0] : [0.2, 0.7, 1.0]}
-          />
-        </Circle>
-        
-        {/* Core intense glow - very bright center */}
-        <Circle
-          cx={140}
-          cy={140}
-          r={isDarkMode ? (50 * glowRadius) : (40 * glowRadius)}
-          opacity={glowOpacity}
-        >
-          <RadialGradient
-            c={vec(140, 140)}
-            r={isDarkMode ? (50 * glowRadius) : (40 * glowRadius)}
-            colors={isDarkMode ? 
-              [accentColor + Math.round(0xFF * glowIntensity).toString(16).padStart(2, '0'), 
-               accentColor + Math.round(0xDD * glowIntensity).toString(16).padStart(2, '0'), 
-               'transparent'] : 
-              [accentColor + Math.round(0xBB * glowIntensity).toString(16).padStart(2, '0'), 
-               accentColor + Math.round(0x77 * glowIntensity).toString(16).padStart(2, '0'), 
-               'transparent']}
-            positions={isDarkMode ? [0.0, 0.4, 1.0] : [0.0, 0.4, 1.0]}
-          />
-        </Circle>
+        {isDarkMode ? (
+          // 다크 모드 - 기존 밝은 글로우 효과
+          <>
+            {/* Outer glow layer */}
+            <Circle
+              cx={140}
+              cy={140}
+              r={100 * glowRadius}
+              opacity={glowOpacity}
+            >
+              <RadialGradient
+                c={vec(140, 140)}
+                r={100 * glowRadius}
+                colors={[
+                  primaryColor + Math.round(0xCC * glowIntensity).toString(16).padStart(2, '0'), 
+                  primaryColor + Math.round(0x88 * glowIntensity).toString(16).padStart(2, '0'), 
+                  'transparent'
+                ]}
+                positions={[0.1, 0.5, 1.0]}
+              />
+            </Circle>
+            
+            {/* Inner glow layer */}
+            <Circle
+              cx={140}
+              cy={140}
+              r={65 * glowRadius}
+              opacity={glowOpacity}
+            >
+              <RadialGradient
+                c={vec(140, 140)}
+                r={65 * glowRadius}
+                colors={[
+                  secondaryColor + Math.round(0xFF * glowIntensity).toString(16).padStart(2, '0'), 
+                  secondaryColor + Math.round(0xBB * glowIntensity).toString(16).padStart(2, '0'), 
+                  'transparent'
+                ]}
+                positions={[0.2, 0.6, 1.0]}
+              />
+            </Circle>
+            
+            {/* Core glow */}
+            <Circle
+              cx={140}
+              cy={140}
+              r={50 * glowRadius}
+              opacity={glowOpacity}
+            >
+              <RadialGradient
+                c={vec(140, 140)}
+                r={50 * glowRadius}
+                colors={[
+                  accentColor + Math.round(0xFF * glowIntensity).toString(16).padStart(2, '0'), 
+                  accentColor + Math.round(0xDD * glowIntensity).toString(16).padStart(2, '0'), 
+                  'transparent'
+                ]}
+                positions={[0.0, 0.4, 1.0]}
+              />
+            </Circle>
+          </>
+        ) : (
+          // 라이트 모드 - 부드러운 단일 글로우 (층짐 방지)
+          <>
+            {/* 하나의 통합된 부드러운 글로우 */}
+            <Circle
+              cx={140}
+              cy={140}
+              r={100 * glowRadius}
+              opacity={glowOpacity}
+            >
+              <RadialGradient
+                c={vec(140, 140)}
+                r={100 * glowRadius}
+                colors={[
+                  'transparent',
+                  primaryColor + Math.round(0x08 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x15 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x25 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x35 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x40 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x30 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x20 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x10 * glowIntensity).toString(16).padStart(2, '0'),
+                  'transparent'
+                ]}
+                positions={[0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
+              />
+            </Circle>
+          </>
+        )}
       </Canvas>
       
       <TouchableOpacity
