@@ -327,15 +327,8 @@ const StartButton: React.FC<StartButtonProps> = ({
           style={[
             styles.button,
             animatedButtonStyle,
-            { 
-              backgroundColor: isDarkMode ? '#f8f9fa' : '#1a1a1a',
-              shadowColor: isDarkMode ? '#000' : '#000',
-              shadowOffset: { width: 0, height: isDarkMode ? 6 : 4 },
-              shadowOpacity: isDarkMode ? 0.25 : 0.15,
-              shadowRadius: isDarkMode ? 12 : 8,
-              borderWidth: isDarkMode ? 2 : 1,
-              borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-            }
+            isDarkMode ? styles.buttonDark : styles.buttonLight,
+            isPressed && (isDarkMode ? styles.buttonPressedDark : styles.buttonPressedLight),
           ]}
         >
           <Text 
@@ -365,11 +358,57 @@ const styles = StyleSheet.create({
   button: {
     width: 140,
     height: 140,
-    
     borderRadius: 70,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  buttonLight: {
+    backgroundColor: '#1a1a1a',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 25,
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    // 라이트 모드에서 더 강한 입체감을 위한 내부 그림자 효과
+  },
+  buttonDark: {
+    backgroundColor: '#f8f9fa',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 20,
+    },
+    shadowOpacity: 0.7,
+    shadowRadius: 35,
+    elevation: 40,
+    borderWidth: 4,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
+    // 다크 모드에서 극적인 입체감 - 플로팅 효과
+  },
+  buttonPressedLight: {
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
     elevation: 12,
+    transform: [{ translateY: 4 }],
+  },
+  buttonPressedDark: {
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 25,
+    transform: [{ translateY: 8 }],
   },
   buttonText: {
     fontSize: 28,

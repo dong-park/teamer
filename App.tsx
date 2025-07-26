@@ -66,20 +66,20 @@ function App() {
               key={preset.name}
               style={[
                 styles.presetButton,
-                {
-                  backgroundColor: selectedPreset === preset.name 
-                    ? (isDarkMode ? '#4a5568' : '#e2e8f0') 
-                    : (isDarkMode ? '#2d3748' : '#f7fafc'),
-                  borderColor: selectedPreset === preset.name 
-                    ? (isDarkMode ? '#63b3ed' : '#3182ce') 
-                    : (isDarkMode ? '#4a5568' : '#e2e8f0'),
-                }
+                isDarkMode ? styles.presetButtonDark : styles.presetButtonLight,
+                selectedPreset === preset.name 
+                  ? (isDarkMode ? styles.presetButtonSelectedDark : styles.presetButtonSelectedLight)
+                  : null
               ]}
               onPress={() => setSelectedPreset(preset.name)}
             >
               <Text style={[
                 styles.presetButtonText,
-                { color: isDarkMode ? '#fff' : '#000' }
+                { 
+                  color: selectedPreset === preset.name 
+                    ? '#fff' 
+                    : (isDarkMode ? '#fff' : '#000')
+                }
               ]}>
                 {preset.label}
               </Text>
@@ -134,9 +134,60 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 2,
     margin: 4,
     minWidth: 80,
+  },
+  presetButtonLight: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  presetButtonDark: {
+    backgroundColor: '#2d3748',
+    borderWidth: 1,
+    borderColor: '#4a5568',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  presetButtonSelectedLight: {
+    backgroundColor: '#3182ce',
+    borderColor: '#2c5aa0',
+    shadowColor: '#3182ce',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    transform: [{ scale: 1.05 }],
+  },
+  presetButtonSelectedDark: {
+    backgroundColor: '#4299e1',
+    borderColor: '#63b3ed',
+    shadowColor: '#4299e1',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 10,
+    transform: [{ scale: 1.05 }],
   },
   presetButtonText: {
     fontSize: 12,
