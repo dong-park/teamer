@@ -5,12 +5,15 @@
  * @format
  */
 
-import React, { useEffect } from 'react';
-import { StyleSheet, useColorScheme as useRNColorScheme, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet, useColorScheme as useRNColorScheme, View, Dimensions, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import './global.css';
-import StartButton from './components/StartButton';
+import FocusTimeScreen from './components/screens/FocusTimeScreen';
+import HomeScreen from './components/screens/HomeScreen';
+import GroupTrackerScreen from './components/screens/GroupTrackerScreen';
+import BottomMenu from './components/BottomMenu';
 
 
 
@@ -19,6 +22,11 @@ function App() {
   // 시스템 다크모드 상태를 가져옵니다
   const systemIsDarkMode = useRNColorScheme() === 'dark';
   const { setColorScheme } = useColorScheme();
+  
+  // 화면 상태 관리
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [currentPage, setCurrentPage] = useState(1); // 홈 화면을 기본으로
+  const screenWidth = Dimensions.get('window').width;
 
   // 시스템 다크모드 상태가 변경될 때 NativeWind에 알림
   useEffect(() => {
@@ -28,19 +36,50 @@ function App() {
   // 다크모드에 따라 배경색을 다르게 적용합니다
   const backgroundColor = systemIsDarkMode ? '#1a202c' : '#fff';
 
+  // 탭 선택 핸들러
+  const handleTabPress = (index: number) => {
+    setCurrentPage(index);
+    scrollViewRef.current?.scrollTo({
+      x: index * screenWidth,
+      animated: true,
+    });
+  };
+
+  // 스크롤 핸들러
+  const handleScroll = (event: any) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const pageIndex = Math.round(offsetX / screenWidth);
+    setCurrentPage(pageIndex);
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-
-
-
-
-        <StartButton 
-          glowIntensity={0.8}
-          glowRadius={1.2}
-          onPress={() => console.log('Start button pressed!')}
+      <View style={styles.container}>
+        <ScrollView
+          ref={scrollViewRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handleScroll}
+          contentOffset={{ x: screenWidth, y: 0 }} // 홈 화면을 기본으로
+          style={styles.scrollView}
+        >
+          <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
+            <FocusTimeScreen />
+          </View>
+          <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
+            <HomeScreen />
+          </View>
+          <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
+            <GroupTrackerScreen />
+          </View>
+        </ScrollView>
+        
+        <BottomMenu 
+          activeIndex={currentPage} 
+          onTabPress={handleTabPress} 
         />
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -49,14 +88,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
+  scrollView: {
+    flex: 1,
   },
-
-
+  page: {
+    flex: 1,
+  },
 });
 
 export default App;

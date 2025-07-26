@@ -16,7 +16,9 @@
       "Bash(npm test)",
       "Bash(npm run lint)",
       "mcp__serena__get_current_config",
-      "mcp__serena__find_file"
+      "mcp__serena__find_file",
+      "Bash(npm install:*)",
+      "Bash(bundle exec pod:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
