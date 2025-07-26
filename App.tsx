@@ -11,10 +11,9 @@ import { SafeAreaView } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import './global.css';
 import StartButton from './components/StartButton';
-import GooeyButton from './components/GooeyButton';
 
 type ColorPreset = 'electric' | 'fire' | 'ocean' | 'forest' | 'sunset' | 'neon' | 'royal';
-type ButtonType = 'ambient' | 'gooey';
+type ButtonType = 'ambient';
 
 function App() {
   // 시스템 다크모드 상태를 가져옵니다
@@ -22,7 +21,7 @@ function App() {
   // 다크모드 토글 상태를 useState로 관리합니다 (초기값은 시스템 설정)
   const [isDarkMode, setIsDarkMode] = useState(systemIsDarkMode);
   const [selectedPreset, setSelectedPreset] = useState<ColorPreset>('electric');
-  const [buttonType, setButtonType] = useState<ButtonType>('ambient');
+  // Removed gooey button functionality - only ambient button remains
   const { setColorScheme } = useColorScheme();
 
   const presets: { name: ColorPreset; label: string }[] = [
@@ -56,49 +55,6 @@ function App() {
           />
         </View>
         
-        <Text style={[styles.sectionTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
-          버튼 타입 선택
-        </Text>
-        
-        <View style={styles.buttonTypeContainer}>
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              {
-                backgroundColor: buttonType === 'ambient' 
-                  ? (isDarkMode ? '#4a5568' : '#e2e8f0') 
-                  : (isDarkMode ? '#2d3748' : '#f7fafc'),
-                borderColor: buttonType === 'ambient' 
-                  ? (isDarkMode ? '#63b3ed' : '#3182ce') 
-                  : (isDarkMode ? '#4a5568' : '#e2e8f0'),
-              }
-            ]}
-            onPress={() => setButtonType('ambient')}
-          >
-            <Text style={[styles.typeButtonText, { color: isDarkMode ? '#fff' : '#000' }]}>
-              ✨ Ambient Light
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[
-              styles.typeButton,
-              {
-                backgroundColor: buttonType === 'gooey' 
-                  ? (isDarkMode ? '#4a5568' : '#e2e8f0') 
-                  : (isDarkMode ? '#2d3748' : '#f7fafc'),
-                borderColor: buttonType === 'gooey' 
-                  ? (isDarkMode ? '#63b3ed' : '#3182ce') 
-                  : (isDarkMode ? '#4a5568' : '#e2e8f0'),
-              }
-            ]}
-            onPress={() => setButtonType('gooey')}
-          >
-            <Text style={[styles.typeButtonText, { color: isDarkMode ? '#fff' : '#000' }]}>
-              💧 Gooey Effect
-            </Text>
-          </TouchableOpacity>
-        </View>
 
         <Text style={[styles.sectionTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
           색깔 프리셋 선택
@@ -131,25 +87,15 @@ function App() {
           ))}
         </View>
 
-        {buttonType === 'ambient' ? (
-          <StartButton 
-            colorPreset={selectedPreset}
-            glowIntensity={0.8}
-            glowRadius={1.2}
-            enablePulse={true}
-            enableHaptic={true}
-            enableTouchFeedback={true}
-            onPress={() => console.log(`Ambient button pressed with ${selectedPreset} preset!`)}
-          />
-        ) : (
-          <GooeyButton 
-            colorPreset={selectedPreset}
-            size="medium"
-            enableHaptic={true}
-            enableTouchFeedback={true}
-            onPress={() => console.log(`Gooey button pressed with ${selectedPreset} preset!`)}
-          />
-        )}
+        <StartButton 
+          colorPreset={selectedPreset}
+          glowIntensity={0.8}
+          glowRadius={1.2}
+          enablePulse={true}
+          enableHaptic={true}
+          enableTouchFeedback={true}
+          onPress={() => console.log(`Ambient button pressed with ${selectedPreset} preset!`)}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -194,25 +140,6 @@ const styles = StyleSheet.create({
   },
   presetButtonText: {
     fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  buttonTypeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 20,
-  },
-  typeButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
-    borderWidth: 2,
-    margin: 8,
-    minWidth: 140,
-  },
-  typeButtonText: {
-    fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
   },

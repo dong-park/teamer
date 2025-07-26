@@ -91,12 +91,6 @@ const StartButton: React.FC<StartButtonProps> = ({
   const pressScale = useSharedValue(1);
   const pressOpacity = useSharedValue(1);
   
-  // Gooey animation values
-  const morphValue = useSharedValue(0);
-  const blobScale1 = useSharedValue(1);
-  const blobScale2 = useSharedValue(1);
-  const blobScale3 = useSharedValue(1);
-  const blobRotation = useSharedValue(0);
 
   // Get current color theme based on preset or custom colors
   const currentColors = colorPreset === 'custom' && customColors ? customColors : colorPresets[colorPreset];

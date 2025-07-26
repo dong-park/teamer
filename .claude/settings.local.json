@@ -1,6 +1,13 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "task-master-ai"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
