@@ -1,8 +1,7 @@
 import { ViewStyle } from 'react-native';
 import { SharedValue } from 'react-native-reanimated';
-import { SkiaValue } from '@shopify/react-native-skia';
 
-export type EffectPattern = 'waves' | 'particles' | 'gradients' | 'mesh' | 'aurora';
+export type EffectPattern = 'waves' | 'spiral' | 'burst' | 'orbit';
 export type Quality = 'low' | 'medium' | 'high';
 export type FPS = 30 | 60;
 

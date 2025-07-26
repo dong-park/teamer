@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, useColorScheme, Vibration, Platform } from 'react-native';
-import { Canvas, Circle, vec, RadialGradient, Path, Skia } from '@shopify/react-native-skia';
-import { useSharedValue, withTiming, Easing, cancelAnimation, useAnimatedStyle, withSpring, withRepeat, interpolate, runOnJS } from 'react-native-reanimated';
+import { Canvas, Circle, vec, RadialGradient } from '@shopify/react-native-skia';
+import { useSharedValue, withTiming, Easing, cancelAnimation, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
+import { ParticleRenderer } from './AmbientEffect/effects/ParticleRenderer';
+import { useAdaptiveConfig } from './AmbientEffect/hooks/useAdaptiveConfig';
+import { EffectPattern } from './AmbientEffect/types';
 
 // Color preset definitions
 type ColorPreset = 'electric' | 'fire' | 'ocean' | 'forest' | 'sunset' | 'neon' | 'royal' | 'custom';
@@ -26,6 +29,9 @@ interface StartButtonProps {
   enablePulse?: boolean; // enable/disable pulse animation
   enableHaptic?: boolean; // enable haptic feedback
   enableTouchFeedback?: boolean; // enable visual touch feedback
+  enableParticles?: boolean; // enable particle effects
+  particlePattern?: EffectPattern; // particle animation pattern
+  adaptiveQuality?: boolean; // enable automatic quality adjustment
 }
 
 // Color preset configurations with vibrant, highly visible colors optimized for both light and dark modes
@@ -126,6 +132,9 @@ const StartButton: React.FC<StartButtonProps> = ({
   enablePulse = true,
   enableHaptic = true,
   enableTouchFeedback = true,
+  enableParticles = true,
+  particlePattern = 'waves',
+  adaptiveQuality = true,
 }) => {
   const [isStarted, setIsStarted] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
@@ -134,7 +143,6 @@ const StartButton: React.FC<StartButtonProps> = ({
   const glowOpacity = useSharedValue(0);
   const pressScale = useSharedValue(1);
   const pressOpacity = useSharedValue(1);
-  
 
   // Get current color theme based on preset or custom colors and color scheme
   const baseColors = colorPreset === 'custom' && customColors ? customColors : colorPresets[colorPreset];
@@ -145,7 +153,27 @@ const StartButton: React.FC<StartButtonProps> = ({
   const primaryColor = currentColors.primary;
   const secondaryColor = currentColors.secondary;
   const accentColor = currentColors.accent;
-  
+
+  // 적응형 설정 훅 사용
+  const { 
+    config: adaptiveConfig, 
+    updateConfig 
+  } = useAdaptiveConfig({
+    enableAutoAdaptation: adaptiveQuality,
+    initialConfig: {
+      colors: [primaryColor, secondaryColor, accentColor],
+      pattern: particlePattern,
+      intensity: glowIntensity,
+    }
+  });
+
+  // 성능 변화 감지 핸들러
+  const handlePerformanceChange = (isGood: boolean) => {
+    if (!isGood && adaptiveQuality) {
+      // 성능이 좋지 않으면 글로우 강도 자동 감소
+      updateConfig({ intensity: Math.max(0.3, adaptiveConfig.intensity * 0.8) });
+    }
+  };
   
   // Haptic feedback function
   const triggerHaptic = () => {
@@ -219,6 +247,22 @@ const StartButton: React.FC<StartButtonProps> = ({
 
   return (
     <View style={styles.container}>
+      {/* 파티클 효과 레이어 (배경) */}
+      {enableParticles && (
+        <ParticleRenderer
+          width={280}
+          height={280}
+          pattern={adaptiveConfig.pattern || particlePattern}
+          intensity={adaptiveConfig.intensity * glowOpacity.value}
+          isActive={isStarted}
+          quality={adaptiveConfig.quality}
+          particleCount={adaptiveConfig.particleCount}
+          colors={adaptiveConfig.colors}
+          onPerformanceChange={handlePerformanceChange}
+        />
+      )}
+      
+      {/* 글로우 효과 레이어 */}
       <Canvas style={styles.canvas}>
         {isDarkMode ? (
           // 다크 모드 - 기존 밝은 글로우 효과
@@ -322,6 +366,7 @@ const StartButton: React.FC<StartButtonProps> = ({
         accessibilityLabel={isStarted ? buttonText.stop : buttonText.start}
         accessibilityHint={isStarted ? "탭하여 중지합니다" : "탭하여 시작합니다"}
         accessibilityState={{ selected: isStarted, busy: isPressed }}
+        style={styles.touchableOpacity}
       >
         <Animated.View
           style={[
@@ -332,7 +377,7 @@ const StartButton: React.FC<StartButtonProps> = ({
           ]}
         >
           <Text 
-            style={[styles.buttonText, { color: isDarkMode ? '#1a1a1a' : '#fff' }]}
+            style={[styles.buttonText, isDarkMode ? styles.buttonTextDark : styles.buttonTextLight]}
             className="text-white dark:text-gray-800 font-bold"
           >
             {isStarted ? buttonText.stop : buttonText.start}
@@ -349,11 +394,13 @@ const styles = StyleSheet.create({
     height: 280,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   canvas: {
     position: 'absolute',
     width: 280,
     height: 280,
+    zIndex: 1, // 글로우 효과를 파티클 위에 표시
   },
   button: {
     width: 140,
@@ -415,6 +462,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1,
     textAlign: 'center',
+  },
+  buttonTextDark: {
+    color: '#1a1a1a',
+  },
+  buttonTextLight: {
+    color: '#fff',
+  },
+  touchableOpacity: {
+    zIndex: 2,
   },
 });
 

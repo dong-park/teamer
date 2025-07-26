@@ -11,9 +11,10 @@ import { SafeAreaView } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import './global.css';
 import StartButton from './components/StartButton';
+import { detectDeviceCapability } from './components/AmbientEffect/utils/deviceDetection';
 
 type ColorPreset = 'electric' | 'fire' | 'ocean' | 'forest' | 'sunset' | 'neon' | 'royal';
-type ButtonType = 'ambient';
+type ParticlePattern = 'waves' | 'spiral' | 'burst' | 'orbit';
 
 function App() {
   // 시스템 다크모드 상태를 가져옵니다
@@ -21,7 +22,9 @@ function App() {
   // 다크모드 토글 상태를 useState로 관리합니다 (초기값은 시스템 설정)
   const [isDarkMode, setIsDarkMode] = useState(systemIsDarkMode);
   const [selectedPreset, setSelectedPreset] = useState<ColorPreset>('electric');
-  // Removed gooey button functionality - only ambient button remains
+  const [selectedPattern, setSelectedPattern] = useState<ParticlePattern>('waves');
+  const [deviceCapability] = useState(() => detectDeviceCapability());
+  const [adaptiveQuality, setAdaptiveQuality] = useState(true);
   const { setColorScheme } = useColorScheme();
 
   const presets: { name: ColorPreset; label: string }[] = [
@@ -32,6 +35,13 @@ function App() {
     { name: 'sunset', label: '🌅 Sunset' },
     { name: 'neon', label: '💚 Neon' },
     { name: 'royal', label: '👑 Royal' },
+  ];
+
+  const patterns: { name: ParticlePattern; label: string }[] = [
+    { name: 'waves', label: '🌊 Waves' },
+    { name: 'spiral', label: '🌀 Spiral' },
+    { name: 'burst', label: '💥 Burst' },
+    { name: 'orbit', label: '🪐 Orbit' },
   ];
 
   // 다크모드 상태가 변경될 때 NativeWind에 알림
@@ -56,7 +66,7 @@ function App() {
         </View>
         
 
-        <Text style={[styles.sectionTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
+        <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : styles.sectionTitleLight]}>
           색깔 프리셋 선택
         </Text>
         
@@ -75,16 +85,58 @@ function App() {
             >
               <Text style={[
                 styles.presetButtonText,
-                { 
-                  color: selectedPreset === preset.name 
-                    ? '#fff' 
-                    : (isDarkMode ? '#fff' : '#000')
-                }
+                selectedPreset === preset.name 
+                  ? styles.presetButtonTextSelected
+                  : (isDarkMode ? styles.presetButtonTextDark : styles.presetButtonTextLight)
               ]}>
                 {preset.label}
               </Text>
             </TouchableOpacity>
           ))}
+        </View>
+
+        <Text style={[styles.sectionTitle, isDarkMode ? styles.sectionTitleDark : styles.sectionTitleLight]}>
+          파티클 패턴 선택
+        </Text>
+        
+        <View style={styles.presetContainer}>
+          {patterns.map((pattern) => (
+            <TouchableOpacity
+              key={pattern.name}
+              style={[
+                styles.presetButton,
+                isDarkMode ? styles.presetButtonDark : styles.presetButtonLight,
+                selectedPattern === pattern.name 
+                  ? (isDarkMode ? styles.presetButtonSelectedDark : styles.presetButtonSelectedLight)
+                  : null
+              ]}
+              onPress={() => setSelectedPattern(pattern.name)}
+            >
+              <Text style={[
+                styles.presetButtonText,
+                selectedPattern === pattern.name 
+                  ? styles.presetButtonTextSelected
+                  : (isDarkMode ? styles.presetButtonTextDark : styles.presetButtonTextLight)
+              ]}>
+                {pattern.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.deviceInfoContainer}>
+          <Text style={[styles.deviceInfoTitle, isDarkMode ? styles.deviceInfoTitleDark : styles.deviceInfoTitleLight]}>
+            디바이스 성능: {deviceCapability.toUpperCase()}
+          </Text>
+          <View style={styles.toggleRow}>
+            <Text style={[styles.deviceInfoText, isDarkMode ? styles.deviceInfoTextDark : styles.deviceInfoTextLight]}>
+              자동 품질 조정
+            </Text>
+            <Switch
+              value={adaptiveQuality}
+              onValueChange={setAdaptiveQuality}
+            />
+          </View>
         </View>
 
         <StartButton 
@@ -94,6 +146,9 @@ function App() {
           enablePulse={true}
           enableHaptic={true}
           enableTouchFeedback={true}
+          enableParticles={true}
+          particlePattern={selectedPattern}
+          adaptiveQuality={adaptiveQuality}
           onPress={() => console.log(`Ambient button pressed with ${selectedPreset} preset!`)}
         />
       </ScrollView>
@@ -193,6 +248,47 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  deviceInfoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  deviceInfoTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  deviceInfoText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  sectionTitleDark: {
+    color: '#fff',
+  },
+  sectionTitleLight: {
+    color: '#000',
+  },
+  presetButtonTextSelected: {
+    color: '#fff',
+  },
+  presetButtonTextDark: {
+    color: '#fff',
+  },
+  presetButtonTextLight: {
+    color: '#000',
+  },
+  deviceInfoTitleDark: {
+    color: '#fff',
+  },
+  deviceInfoTitleLight: {
+    color: '#000',
+  },
+  deviceInfoTextDark: {
+    color: '#ccc',
+  },
+  deviceInfoTextLight: {
+    color: '#666',
   },
 });
 
