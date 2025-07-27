@@ -1,17 +1,20 @@
 import React, { useState, useRef } from 'react';
-import { View, ScrollView, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, TouchableOpacity, Dimensions, useColorScheme } from 'react-native';
 import StartButton from '../StartButton';
 import PresetMenu from '../PresetMenu';
+import PresetManagementScreen from './PresetManagementScreen';
 import { useTimer } from '../../App';
 import { usePreset } from '../../contexts/PresetContext';
 import { Preset } from '../../types/preset';
 
 const HomeScreen: React.FC = () => {
   const { isRunning, startTimer, stopTimer, elapsedTime, startTime, achievementRate, targetTime, setTargetTime } = useTimer();
-  const { presetMenuState, showPresetMenu, hidePresetMenu, selectPreset, getRecentPresets, updatePresetUsage } = usePreset();
+  const { currentPreset, presetMenuState, showPresetMenu, hidePresetMenu, selectPreset, setCurrentPreset, getRecentPresets, updatePresetUsage } = usePreset();
   const [showTargetSettings, setShowTargetSettings] = useState(false);
+  const [showPresetManagement, setShowPresetManagement] = useState(false);
   const buttonLayoutRef = useRef<View>(null);
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
+  const isDarkMode = useColorScheme() === 'dark';
 
   
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -89,10 +92,11 @@ const HomeScreen: React.FC = () => {
     // 선택된 프리셋의 사용량 업데이트
     updatePresetUsage(preset.id);
     
-    // 첫 번째 할일의 지속 시간을 목표 시간으로 설정
-    if (preset.todos.length > 0 && preset.todos[0].duration) {
-      setTargetTime(preset.todos[0].duration * 60 * 1000);
-    }
+    // 현재 프리셋으로 설정
+    setCurrentPreset(preset);
+    
+    // 프리셋의 목표 시간을 설정 (분 단위를 밀리초로 변환)
+    setTargetTime(preset.targetTime * 60 * 1000);
     
     // 타이머 시작
     if (!isRunning) {
@@ -112,14 +116,104 @@ const HomeScreen: React.FC = () => {
 
   const dynamicGlowRadius = calculateGlowRadius(achievementRate);
 
+  if (showPresetManagement) {
+    return <PresetManagementScreen onClose={() => setShowPresetManagement(false)} />;
+  }
+
   return (
     <View className="flex-1">
-      {/* 디버깅 정보 표시 */}
+      {/* 프리셋 관리 버튼 */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          style={[styles.presetManagementButton, { backgroundColor: isDarkMode ? '#4a5568' : '#ffffff' }]}
+          onPress={() => setShowPresetManagement(true)}
+        >
+          <Text style={[styles.presetManagementButtonText, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
+            ⚙️
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
       >
+        {/* 디버깅 정보 표시 */}
+        <View style={[styles.debugContainer, { backgroundColor: isDarkMode ? '#1a202c' : '#f7fafc' }]}>
+          <Text style={[styles.debugTitle, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
+            디버깅 정보
+          </Text>
+          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+            목표 시간: {formatTargetTime(targetTime)}
+          </Text>
+          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+            경과 시간: {formatElapsedTime(elapsedTime)}
+          </Text>
+          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+            달성률: {(achievementRate * 100).toFixed(1)}%
+          </Text>
+          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+            타이머 상태: {isRunning ? '실행 중' : '정지'}
+          </Text>
+          {startTime && (
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              시작 시간: {formatStartTime(startTime)}
+            </Text>
+          )}
+          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+            Glow Radius: {dynamicGlowRadius.toFixed(2)}
+          </Text>
+          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+            현재 프리셋 색상: {currentPreset?.color || '없음'}
+          </Text>
+          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+            ColorPreset: {currentPreset ? 'custom' : 'electric'}
+          </Text>
+          {currentPreset && (
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              CustomColors: {JSON.stringify({
+                primary: currentPreset.color,
+                secondary: currentPreset.color,
+                accent: currentPreset.color
+              })}
+            </Text>
+          )}
+        </View>
+
+        {/* 현재 프리셋 표시 */}
+        {currentPreset && (
+          <View style={[styles.currentPresetContainer, { backgroundColor: isDarkMode ? '#2d3748' : '#ffffff' }]}>
+            <Text style={[styles.currentPresetLabel, { color: isDarkMode ? '#a0aec0' : '#718096' }]}>
+              현재 프리셋
+            </Text>
+            <View style={styles.currentPresetInfo}>
+              <View style={[styles.currentPresetColor, { backgroundColor: currentPreset.color }]} />
+              <Text style={[styles.currentPresetName, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
+                {currentPreset.name}
+              </Text>
+              <TouchableOpacity 
+                onPress={() => setCurrentPreset(null)}
+                style={styles.clearPresetButton}
+              >
+                <Text style={[styles.clearPresetButtonText, { color: isDarkMode ? '#a0aec0' : '#718096' }]}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.presetTargetTime, { color: isDarkMode ? '#e2e8f0' : '#4a5568' }]}>
+              목표 시간: {currentPreset.targetTime}분
+            </Text>
+            {currentPreset.todos.length > 0 && (
+              <View style={styles.currentPresetTodos}>
+                {currentPreset.todos.map((todo, index) => (
+                  <View key={todo.id} style={styles.currentTodoItem}>
+                    <View style={[styles.todoColorDot, { backgroundColor: todo.color }]} />
+                    <Text style={[styles.todoTitle, { color: isDarkMode ? '#e2e8f0' : '#4a5568' }]}>
+                      {todo.title}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
       
         <View ref={buttonLayoutRef}>
           <StartButton 
@@ -127,6 +221,12 @@ const HomeScreen: React.FC = () => {
             glowRadius={dynamicGlowRadius}
             onPress={handleStartButtonPress}
             onLongPress={handleLongPress}
+            customColors={currentPreset ? {
+              primary: currentPreset.color,
+              secondary: currentPreset.color,
+              accent: currentPreset.color
+            } : undefined}
+            colorPreset={currentPreset ? 'custom' : 'electric'}
           />
         </View>
       </ScrollView>
@@ -145,11 +245,128 @@ const HomeScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+  },
+  presetManagementButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  presetManagementButtonText: {
+    fontSize: 20,
+  },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  debugContainer: {
+    width: '100%',
+    maxWidth: 350,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
+  },
+  debugTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  debugText: {
+    fontSize: 14,
+    marginBottom: 6,
+    fontFamily: 'monospace',
+  },
+  currentPresetContainer: {
+    width: '100%',
+    maxWidth: 350,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  currentPresetLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  currentPresetInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  currentPresetColor: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  currentPresetName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    flex: 1,
+    textAlign: 'center',
+  },
+  clearPresetButton: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+  },
+  clearPresetButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  presetTargetTime: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  currentPresetTodos: {
+    gap: 8,
+  },
+  currentTodoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,0,0,0.02)',
+  },
+  todoColorDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 12,
+  },
+  todoTitle: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

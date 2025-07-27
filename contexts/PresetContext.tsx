@@ -3,11 +3,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Preset, TodoItem, PresetMenuState } from '../types/preset';
 
 interface PresetContextType {
+  presets: Preset[];
+  currentPreset: Preset | null;
   presetMenuState: PresetMenuState;
   showPresetMenu: () => void;
   hidePresetMenu: () => void;
   selectPreset: (preset: Preset) => void;
+  setCurrentPreset: (preset: Preset | null) => void;
   addPreset: (preset: Omit<Preset, 'id' | 'createdAt' | 'lastUsed' | 'usageCount'>) => void;
+  updatePreset: (preset: Preset) => void;
+  deletePreset: (presetId: string) => void;
   updatePresetUsage: (presetId: string) => void;
   getRecentPresets: () => Preset[];
 }
@@ -22,10 +27,12 @@ const defaultPresets: Preset[] = [
   {
     id: '1',
     name: '개발 작업',
+    color: '#3B82F6',
+    targetTime: 1,
     todos: [
-      { id: '1-1', title: '코딩', color: '#3B82F6', duration: 25 },
-      { id: '1-2', title: '테스트', color: '#10B981', duration: 15 },
-      { id: '1-3', title: '디버깅', color: '#F59E0B', duration: 20 },
+      { id: '1-1', title: '코딩', color: '#3B82F6' },
+      { id: '1-2', title: '테스트', color: '#10B981' },
+      { id: '1-3', title: '디버깅', color: '#F59E0B' },
     ],
     createdAt: new Date('2024-01-01'),
     lastUsed: new Date('2024-01-15'),
@@ -34,10 +41,12 @@ const defaultPresets: Preset[] = [
   {
     id: '2',
     name: '공부',
+    color: '#8B5CF6',
+    targetTime: 45,
     todos: [
-      { id: '2-1', title: '독서', color: '#8B5CF6', duration: 30 },
-      { id: '2-2', title: '정리', color: '#06B6D4', duration: 15 },
-      { id: '2-3', title: '복습', color: '#84CC16', duration: 20 },
+      { id: '2-1', title: '독서', color: '#8B5CF6' },
+      { id: '2-2', title: '정리', color: '#06B6D4' },
+      { id: '2-3', title: '복습', color: '#84CC16' },
     ],
     createdAt: new Date('2024-01-02'),
     lastUsed: new Date('2024-01-14'),
@@ -46,10 +55,12 @@ const defaultPresets: Preset[] = [
   {
     id: '3',
     name: '운동',
+    color: '#EF4444',
+    targetTime: 30,
     todos: [
-      { id: '3-1', title: '웜업', color: '#F97316', duration: 10 },
-      { id: '3-2', title: '근력 운동', color: '#EF4444', duration: 30 },
-      { id: '3-3', title: '스트레칭', color: '#14B8A6', duration: 10 },
+      { id: '3-1', title: '웜업', color: '#F97316' },
+      { id: '3-2', title: '근력 운동', color: '#EF4444' },
+      { id: '3-3', title: '스트레칭', color: '#14B8A6' },
     ],
     createdAt: new Date('2024-01-03'),
     lastUsed: new Date('2024-01-13'),
@@ -58,10 +69,12 @@ const defaultPresets: Preset[] = [
   {
     id: '4',
     name: '창작2',
+    color: '#EC4899',
+    targetTime: 50,
     todos: [
-      { id: '4-1', title: '아이디어 정리', color: '#EC4899', duration: 15 },
-      { id: '4-2', title: '글쓰기', color: '#6366F1', duration: 25 },
-      { id: '4-3', title: '검토', color: '#8B5CF6', duration: 10 },
+      { id: '4-1', title: '아이디어 정리', color: '#EC4899' },
+      { id: '4-2', title: '글쓰기', color: '#6366F1' },
+      { id: '4-3', title: '검토', color: '#8B5CF6' },
     ],
     createdAt: new Date('2024-01-04'),
     lastUsed: new Date('2024-01-12'),
@@ -70,10 +83,12 @@ const defaultPresets: Preset[] = [
   {
     id: '5',
     name: '요리',
+    color: '#F59E0B',
+    targetTime: 40,
     todos: [
-      { id: '5-1', title: '재료 준비', color: '#F59E0B', duration: 15 },
-      { id: '5-2', title: '조리', color: '#DC2626', duration: 30 },
-      { id: '5-3', title: '마무리', color: '#059669', duration: 10 },
+      { id: '5-1', title: '재료 준비', color: '#F59E0B' },
+      { id: '5-2', title: '조리', color: '#DC2626' },
+      { id: '5-3', title: '마무리', color: '#059669' },
     ],
     createdAt: new Date('2024-01-05'),
     lastUsed: new Date('2024-01-11'),
@@ -119,6 +134,7 @@ const defaultPresets: Preset[] = [
 
 export const PresetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [presets, setPresets] = useState<Preset[]>(defaultPresets);
+  const [currentPreset, setCurrentPreset] = useState<Preset | null>(null);
   const [presetMenuState, setPresetMenuState] = useState<PresetMenuState>({
     isVisible: false,
     recentPresets: [],
@@ -197,6 +213,24 @@ export const PresetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     updateRecentPresets(updatedPresets);
   }, [presets, savePresets, updateRecentPresets]);
 
+  // 프리셋 업데이트
+  const updatePreset = useCallback(async (updatedPreset: Preset) => {
+    const updatedPresets = presets.map(preset => 
+      preset.id === updatedPreset.id ? updatedPreset : preset
+    );
+    setPresets(updatedPresets);
+    await savePresets(updatedPresets);
+    updateRecentPresets(updatedPresets);
+  }, [presets, savePresets, updateRecentPresets]);
+
+  // 프리셋 삭제
+  const deletePreset = useCallback(async (presetId: string) => {
+    const updatedPresets = presets.filter(preset => preset.id !== presetId);
+    setPresets(updatedPresets);
+    await savePresets(updatedPresets);
+    updateRecentPresets(updatedPresets);
+  }, [presets, savePresets, updateRecentPresets]);
+
   // 프리셋 사용 횟수 업데이트
   const updatePresetUsage = useCallback(async (presetId: string) => {
     const updatedPresets = presets.map(preset => 
@@ -224,11 +258,16 @@ export const PresetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [loadPresets]);
 
   const contextValue: PresetContextType = {
+    presets,
+    currentPreset,
     presetMenuState,
     showPresetMenu,
     hidePresetMenu,
     selectPreset,
+    setCurrentPreset,
     addPreset,
+    updatePreset,
+    deletePreset,
     updatePresetUsage,
     getRecentPresets,
   };

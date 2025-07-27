@@ -156,7 +156,7 @@ const StartButton: React.FC<StartButtonProps> = ({
 
   // Get current color theme based on preset or custom colors and color scheme
   const baseColors = colorPreset === 'custom' && customColors ? customColors : colorPresets[colorPreset];
-  const lightColors = lightModeColorPresets[colorPreset];
+  const lightColors = colorPreset === 'custom' && customColors ? customColors : lightModeColorPresets[colorPreset];
   
   // 라이트 모드에서는 어두운 색상 사용, 다크 모드에서는 밝은 색상 사용
   const currentColors = isDarkMode ? baseColors : lightColors;
