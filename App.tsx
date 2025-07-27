@@ -39,7 +39,8 @@ function App() {
   }, [systemIsDarkMode, setColorScheme]);
 
   // 다크모드에 따라 배경색을 다르게 적용합니다
-  const backgroundColor = systemIsDarkMode ? '#1a202c' : '#fff';
+  // 라이트 모드에서는 약간 어두운 회색으로 설정하여 앰비언트 효과가 더 잘 보이도록 함
+  const backgroundColor = systemIsDarkMode ? '#1a202c' : '#f8f8f8';
 
   // 탭 선택 핸들러
   const handleTabPress = (index: number) => {
