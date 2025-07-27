@@ -15,6 +15,7 @@ import HomeScreen from './components/screens/HomeScreen';
 import GroupTrackerScreen from './components/screens/GroupTrackerScreen';
 import BottomMenu from './components/BottomMenu';
 import { TimerContext, useTimerLogic, TimerContextType } from './hooks/useTimer';
+import { PresetProvider } from './contexts/PresetContext';
 
 // Re-export useTimer for backward compatibility
 export { useTimer } from './hooks/useTimer';
@@ -62,36 +63,38 @@ function App() {
   const timerContextValue: TimerContextType = timerLogic;
 
   return (
-    <TimerContext.Provider value={timerContextValue}>
-      <SafeAreaView style={[styles.container, { backgroundColor }]}>
-        <View style={styles.container}>
-          <ScrollView
-          ref={scrollViewRef}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={handleScroll}
-          contentOffset={{ x: screenWidth, y: 0 }} // 홈 화면을 기본으로
-          style={styles.scrollView}
-        >
-          <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
-            <FocusTimeScreen />
-          </View>
-          <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
-            <HomeScreen />
-          </View>
-          <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
-            <GroupTrackerScreen />
-          </View>
-        </ScrollView>
-        
-        <BottomMenu 
-          activeIndex={currentPage} 
-          onTabPress={handleTabPress} 
-        />
-      </View>
-    </SafeAreaView>
-    </TimerContext.Provider>
+    <PresetProvider>
+      <TimerContext.Provider value={timerContextValue}>
+        <SafeAreaView style={[styles.container, { backgroundColor }]}>
+          <View style={styles.container}>
+            <ScrollView
+            ref={scrollViewRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={handleScroll}
+            contentOffset={{ x: screenWidth, y: 0 }} // 홈 화면을 기본으로
+            style={styles.scrollView}
+          >
+            <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
+              <FocusTimeScreen />
+            </View>
+            <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
+              <HomeScreen />
+            </View>
+            <View style={[styles.page, { width: screenWidth, backgroundColor }]}>
+              <GroupTrackerScreen />
+            </View>
+          </ScrollView>
+          
+          <BottomMenu 
+            activeIndex={currentPage} 
+            onTabPress={handleTabPress} 
+          />
+        </View>
+      </SafeAreaView>
+      </TimerContext.Provider>
+    </PresetProvider>
   );
 }
 

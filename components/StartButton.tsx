@@ -1,5 +1,5 @@
 import { Canvas, Circle, RadialGradient, vec } from '@shopify/react-native-skia';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, useColorScheme, Vibration, View } from 'react-native';
 import Animated, { cancelAnimation, Easing, runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { ParticleRenderer } from './AmbientEffect/effects/ParticleRenderer';
@@ -19,6 +19,7 @@ interface StartButtonProps {
   colorPreset?: ColorPreset;
   customColors?: ColorTheme;
   onPress?: () => void;
+  onLongPress?: () => void; // 길게 누르기 콜백
   buttonText?: {
     start: string;
     stop: string;
@@ -31,6 +32,7 @@ interface StartButtonProps {
   enableParticles?: boolean; // enable particle effects
   particlePattern?: EffectPattern; // particle animation pattern
   adaptiveQuality?: boolean; // enable automatic quality adjustment
+  longPressDuration?: number; // 길게 누르기 감지 시간 (ms)
 }
 
 // Color preset configurations with vibrant, highly visible colors optimized for both light and dark modes
@@ -125,6 +127,7 @@ const StartButton: React.FC<StartButtonProps> = ({
   colorPreset = 'electric',
   customColors,
   onPress,
+  onLongPress,
   buttonText = { start: '시작', stop: '정지' },
   glowIntensity = 1.0,
   glowRadius = 1.0,
@@ -134,6 +137,7 @@ const StartButton: React.FC<StartButtonProps> = ({
   enableParticles = true,
   particlePattern = 'waves',
   adaptiveQuality = true,
+  longPressDuration = 800,
 }) => {
   const [isStarted, setIsStarted] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
@@ -144,6 +148,10 @@ const StartButton: React.FC<StartButtonProps> = ({
   const glowOpacity = useSharedValue(0);
   const pressScale = useSharedValue(1);
   const pressOpacity = useSharedValue(1);
+  
+  // 길게 누르기 관련 상태
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const [isLongPressing, setIsLongPressing] = useState(false);
 
 
   // Get current color theme based on preset or custom colors and color scheme
@@ -199,6 +207,28 @@ const StartButton: React.FC<StartButtonProps> = ({
     }
   };
 
+  // 길게 누르기 시작
+  const startLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+    }
+    
+    longPressTimer.current = setTimeout(() => {
+      setIsLongPressing(true);
+      triggerHaptic(); // 길게 누르기 감지 시 햅틱
+      onLongPress?.();
+    }, longPressDuration);
+  };
+
+  // 길게 누르기 취소
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    setIsLongPressing(false);
+  };
+
   // Touch feedback handlers
   const handlePressIn = () => {
     if (enableTouchFeedback) {
@@ -209,6 +239,9 @@ const StartButton: React.FC<StartButtonProps> = ({
       });
       pressOpacity.value = withTiming(0.8, { duration: 100 });
     }
+    
+    // 길게 누르기 시작
+    startLongPress();
   };
 
   const handlePressOut = () => {
@@ -220,9 +253,17 @@ const StartButton: React.FC<StartButtonProps> = ({
       });
       pressOpacity.value = withTiming(1, { duration: 150 });
     }
+    
+    // 길게 누르기 취소
+    cancelLongPress();
   };
 
   const handlePress = () => {
+    // 길게 누르기 중이면 일반 누르기 무시
+    if (isLongPressing) {
+      return;
+    }
+    
     // Trigger haptic feedback
     triggerHaptic();
     

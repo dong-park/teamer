@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, ScrollView, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import StartButton from '../StartButton';
+import PresetMenu from '../PresetMenu';
 import { useTimer } from '../../App';
+import { usePreset } from '../../contexts/PresetContext';
+import { Preset } from '../../types/preset';
 
 const HomeScreen: React.FC = () => {
   const { isRunning, startTimer, stopTimer, elapsedTime, startTime, achievementRate, targetTime, setTargetTime } = useTimer();
+  const { presetMenuState, showPresetMenu, hidePresetMenu, selectPreset, getRecentPresets, updatePresetUsage } = usePreset();
   const [showTargetSettings, setShowTargetSettings] = useState(false);
+  const buttonLayoutRef = useRef<View>(null);
+  const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
+  
+  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
   // 경과 시간을 포맷하는 함수
   const formatElapsedTime = (milliseconds: number): string => {
@@ -50,6 +58,36 @@ const HomeScreen: React.FC = () => {
     } else {
       startTimer();
     }
+  };
+
+  // 길게 누르기 핸들러
+  const handleLongPress = () => {
+    // 버튼 위치 측정
+    buttonLayoutRef.current?.measure((x, y, width, height, pageX, pageY) => {
+      setButtonPosition({
+        x: pageX + width / 2,
+        y: pageY + height / 2,
+      });
+      showPresetMenu();
+    });
+  };
+
+  // 프리셋 선택 핸들러
+  const handlePresetSelect = (preset: Preset) => {
+    // 선택된 프리셋의 사용량 업데이트
+    updatePresetUsage(preset.id);
+    
+    // 첫 번째 할일의 지속 시간을 목표 시간으로 설정
+    if (preset.todos.length > 0 && preset.todos[0].duration) {
+      setTargetTime(preset.todos[0].duration * 60 * 1000);
+    }
+    
+    // 타이머 시작
+    if (!isRunning) {
+      startTimer();
+    }
+    
+    hidePresetMenu();
   };
 
   // 달성률에 따른 glowRadius 계산 (1.4 ~ 1.9)
@@ -109,12 +147,25 @@ const HomeScreen: React.FC = () => {
           )}
         </View>
 
-        <StartButton 
-          glowIntensity={0.8}
-          glowRadius={dynamicGlowRadius}
-          onPress={handleStartButtonPress}
-        />
+        <View ref={buttonLayoutRef}>
+          <StartButton 
+            glowIntensity={0.8}
+            glowRadius={dynamicGlowRadius}
+            onPress={handleStartButtonPress}
+            onLongPress={handleLongPress}
+          />
+        </View>
       </ScrollView>
+
+      {/* 프리셋 메뉴 */}
+      <PresetMenu
+        isVisible={presetMenuState.isVisible}
+        presets={getRecentPresets()}
+        onSelectPreset={handlePresetSelect}
+        onClose={hidePresetMenu}
+        centerX={buttonPosition.x}
+        centerY={buttonPosition.y}
+      />
     </View>
   );
 };
