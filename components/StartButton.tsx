@@ -1,8 +1,7 @@
+import { Canvas, Circle, RadialGradient, vec } from '@shopify/react-native-skia';
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, useColorScheme, Vibration, Platform } from 'react-native';
-import { Canvas, Circle, vec, RadialGradient } from '@shopify/react-native-skia';
-import { useSharedValue, withTiming, Easing, cancelAnimation, useAnimatedStyle, withSpring, useAnimatedReaction, runOnJS } from 'react-native-reanimated';
-import Animated from 'react-native-reanimated';
+import { Platform, StyleSheet, Text, TouchableOpacity, useColorScheme, Vibration, View } from 'react-native';
+import Animated, { cancelAnimation, Easing, runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { ParticleRenderer } from './AmbientEffect/effects/ParticleRenderer';
 import { useAdaptiveConfig } from './AmbientEffect/hooks/useAdaptiveConfig';
 import { EffectPattern } from './AmbientEffect/types';
@@ -257,13 +256,21 @@ const StartButton: React.FC<StartButtonProps> = ({
     };
   });
 
+  // 화면 크기에 맞는 동적 Canvas 크기 계산
+  const maxGlowSize = Math.max(100 * glowRadius, 280);
+  const canvasSize = Math.min(maxGlowSize * 2, 1000); // 최대 1000px로 제한 (더 큰 글로우 허용)
+  const canvasCenter = canvasSize / 2;
+  
+  // 성능 최적화를 위한 그라디언트 단계 수 조절
+  const gradientSteps = glowRadius > 3 ? 5 : 9; // 큰 글로우에서는 단계 수 줄임
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { width: canvasSize, height: canvasSize }]}>
       {/* 파티클 효과 레이어 (배경) */}
       {enableParticles && (
         <ParticleRenderer
-          width={280}
-          height={280}
+          width={canvasSize}
+          height={canvasSize}
           pattern={adaptiveConfig.pattern || particlePattern}
           intensity={currentIntensity}
           isActive={isStarted}
@@ -275,19 +282,19 @@ const StartButton: React.FC<StartButtonProps> = ({
       )}
       
       {/* 글로우 효과 레이어 */}
-      <Canvas style={styles.canvas}>
+      <Canvas style={[styles.canvas, { width: canvasSize, height: canvasSize }]}>
         {isDarkMode ? (
           // 다크 모드 - 기존 밝은 글로우 효과
           <>
             {/* Outer glow layer */}
             <Circle
-              cx={140}
-              cy={140}
+              cx={canvasCenter}
+              cy={canvasCenter}
               r={100 * glowRadius}
               opacity={currentOpacity}
             >
               <RadialGradient
-                c={vec(140, 140)}
+                c={vec(canvasCenter, canvasCenter)}
                 r={100 * glowRadius}
                 colors={[
                   primaryColor + Math.round(0xCC * glowIntensity).toString(16).padStart(2, '0'), 
@@ -300,13 +307,13 @@ const StartButton: React.FC<StartButtonProps> = ({
             
             {/* Inner glow layer */}
             <Circle
-              cx={140}
-              cy={140}
+              cx={canvasCenter}
+              cy={canvasCenter}
               r={65 * glowRadius}
               opacity={currentOpacity}
             >
               <RadialGradient
-                c={vec(140, 140)}
+                c={vec(canvasCenter, canvasCenter)}
                 r={65 * glowRadius}
                 colors={[
                   secondaryColor + Math.round(0xFF * glowIntensity).toString(16).padStart(2, '0'), 
@@ -319,13 +326,13 @@ const StartButton: React.FC<StartButtonProps> = ({
             
             {/* Core glow */}
             <Circle
-              cx={140}
-              cy={140}
+              cx={canvasCenter}
+              cy={canvasCenter}
               r={50 * glowRadius}
               opacity={currentOpacity}
             >
               <RadialGradient
-                c={vec(140, 140)}
+                c={vec(canvasCenter, canvasCenter)}
                 r={50 * glowRadius}
                 colors={[
                   accentColor + Math.round(0xFF * glowIntensity).toString(16).padStart(2, '0'), 
@@ -341,15 +348,23 @@ const StartButton: React.FC<StartButtonProps> = ({
           <>
             {/* 하나의 통합된 부드러운 글로우 */}
             <Circle
-              cx={140}
-              cy={140}
+              cx={canvasCenter}
+              cy={canvasCenter}
               r={100 * glowRadius}
               opacity={currentOpacity}
             >
               <RadialGradient
-                c={vec(140, 140)}
+                c={vec(canvasCenter, canvasCenter)}
                 r={100 * glowRadius}
-                colors={[
+                colors={gradientSteps === 5 ? [
+                  // 성능 최적화된 5단계 그라디언트
+                  'transparent',
+                  primaryColor + Math.round(0x20 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x40 * glowIntensity).toString(16).padStart(2, '0'),
+                  primaryColor + Math.round(0x20 * glowIntensity).toString(16).padStart(2, '0'),
+                  'transparent'
+                ] : [
+                  // 품질 중심 9단계 그라디언트
                   'transparent',
                   primaryColor + Math.round(0x08 * glowIntensity).toString(16).padStart(2, '0'),
                   primaryColor + Math.round(0x15 * glowIntensity).toString(16).padStart(2, '0'),
@@ -361,7 +376,7 @@ const StartButton: React.FC<StartButtonProps> = ({
                   primaryColor + Math.round(0x10 * glowIntensity).toString(16).padStart(2, '0'),
                   'transparent'
                 ]}
-                positions={[0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
+                positions={gradientSteps === 5 ? [0.0, 0.3, 0.5, 0.7, 1.0] : [0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
               />
             </Circle>
           </>
@@ -402,16 +417,12 @@ const StartButton: React.FC<StartButtonProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: 280,
-    height: 280,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
   },
   canvas: {
     position: 'absolute',
-    width: 280,
-    height: 280,
     zIndex: 1, // 글로우 효과를 파티클 위에 표시
   },
   button: {

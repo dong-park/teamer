@@ -5,9 +5,12 @@ export interface TimerContextType {
   isRunning: boolean;
   startTime: Date | null;
   elapsedTime: number;
+  targetTime: number; // 목표 시간 (밀리초)
+  achievementRate: number; // 달성률 (0.0 ~ 1.0)
   startTimer: () => void;
   stopTimer: () => void;
   resetTimer: () => void;
+  setTargetTime: (time: number) => void;
 }
 
 // Timer Context
@@ -27,7 +30,11 @@ export const useTimerLogic = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [targetTime, setTargetTime] = useState(25 * 60 * 1000); // 기본 25분 (포모도로)
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // 달성률 계산 (0.0 ~ 1.0)
+  const achievementRate = targetTime > 0 ? Math.min(elapsedTime / targetTime, 1.0) : 0;
 
   // 타이머 함수들
   const startTimer = () => {
@@ -79,8 +86,11 @@ export const useTimerLogic = () => {
     isRunning,
     startTime,
     elapsedTime,
+    targetTime,
+    achievementRate,
     startTimer,
     stopTimer,
     resetTimer,
+    setTargetTime,
   };
 };

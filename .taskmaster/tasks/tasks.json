@@ -174,11 +174,27 @@
         ],
         "status": "pending",
         "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement Ambient Light Glow Enhancement with Achievement-Based Dynamic Sizing",
+        "description": "Enhance the ambient light glow effect to prevent square clipping issues and implement a timer achievement system with dynamic glow radius based on completion percentage",
+        "details": "This task involves two major improvements: fixing the glow effect clipping issue and implementing an achievement-based sizing system.\n\n1. **Fix Glow Effect Clipping**:\n   - Modify StartButton.tsx to dynamically calculate canvas size based on glowRadius\n   - Implement dynamic canvas sizing up to 1000px maximum\n   - Update center point calculations to be relative to dynamic canvas size\n   - Use react-native-skia Canvas with proper width/height props\n\n2. **Extend Timer System with Target Time**:\n   - Update useTimer hook interface to include:\n     ```typescript\n     interface TimerContext {\n       // existing properties...\n       targetTime: number; // in seconds\n       achievementRate: number; // 0-1\n       setTargetTime: (time: number) => void;\n     }\n     ```\n   - Default target time: 1500 seconds (25 minutes - Pomodoro technique)\n   - Calculate achievement rate: `Math.min(elapsedTime / targetTime, 1)`\n\n3. **Implement Dynamic Glow Radius**:\n   - Base formula: `glowRadius = 1.2 + (0.7 * achievementRate)`\n   - Range: 1.2 (0% achievement) to 1.9 (100% achievement)\n   - Use react-native-reanimated interpolation for smooth transitions:\n     ```typescript\n     const animatedGlowRadius = useAnimatedStyle(() => {\n       return {\n         glowRadius: withSpring(1.2 + (0.7 * achievementRate.value))\n       };\n     });\n     ```\n\n4. **Target Time Selection UI**:\n   - Create preset buttons: [1, 5, 10, 15, 20, 25, 30, 45, 60] minutes\n   - Use NativeWind for styling preset buttons\n   - Disable selection when timer is running\n   - Display current target time and achievement percentage\n   - Use Pressable components for better touch feedback\n\n5. **Performance Optimization**:\n   - Implement adaptive gradient steps based on glowRadius:\n     ```typescript\n     const gradientSteps = glowRadius > 1.5 ? 5 : 9;\n     ```\n   - Use runOnUI for all animation calculations\n   - Implement memoization for gradient calculations\n   - Consider using react-native-skia's SkiaView for better performance with large canvases",
+        "testStrategy": "1. **Visual Testing**: Verify glow effect displays correctly without square clipping at all radius sizes (1.2 to 1.9). Test on both iOS and Android devices with different screen sizes.\n\n2. **Achievement System Testing**: Start timer and verify achievement rate increases correctly from 0% to 100% over target time. Test with different target times (1 min, 25 min, 60 min).\n\n3. **Dynamic Sizing Testing**: Monitor glow radius changes smoothly as achievement rate increases. Verify no visual jumps or stuttering during transitions.\n\n4. **UI Testing**: Test all preset time buttons work correctly and are disabled during active timer. Verify target time can only be changed when timer is stopped. Test achievement percentage displays accurately.\n\n5. **Performance Testing**: Use React DevTools Profiler to ensure 60fps is maintained even with large glow radius. Test on low-end Android devices to verify performance optimizations work effectively. Monitor memory usage with large canvas sizes.",
+        "status": "pending",
+        "dependencies": [
+          5,
+          6,
+          7,
+          10
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-07-20T02:25:49.784Z",
-      "updated": "2025-07-20T03:05:47.981Z",
+      "updated": "2025-07-27T01:34:36.272Z",
       "description": "Tasks for master context"
     }
   }
