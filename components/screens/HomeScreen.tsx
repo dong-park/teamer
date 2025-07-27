@@ -12,6 +12,7 @@ const HomeScreen: React.FC = () => {
   const [showTargetSettings, setShowTargetSettings] = useState(false);
   const buttonLayoutRef = useRef<View>(null);
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
+
   
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -64,9 +65,20 @@ const HomeScreen: React.FC = () => {
   const handleLongPress = () => {
     // 버튼 위치 측정
     buttonLayoutRef.current?.measure((x, y, width, height, pageX, pageY) => {
+      // 캔버스 중심 계산
+      const canvasCenterX = pageX + width / 2;
+      const canvasCenterY = pageY + height / 2;
+      
+      // 실제 버튼은 140x140이고 캔버스 중심에 위치하므로 좌표 보정 불필요
+      // 하지만 실제 측정값을 보면 캔버스가 예상보다 아래에 위치함
+      // 실제 시각적 중심으로 보정
+      const actualButtonY = canvasCenterY - 65; // 65px 위쪽으로 보정
+      
+
+      
       setButtonPosition({
-        x: pageX + width / 2,
-        y: pageY + height / 2,
+        x: canvasCenterX,
+        y: actualButtonY,
       });
       showPresetMenu();
     });
@@ -102,51 +114,13 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View className="flex-1">
+      {/* 디버깅 정보 표시 */}
+
+      
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
       >
-        {/* 목표 시간 설정만 유지 */}
-        <View className="mb-8 items-center">
-          {!isRunning && (
-            <View className="mt-3">
-              <TouchableOpacity 
-                onPress={() => setShowTargetSettings(!showTargetSettings)}
-                className="mb-2"
-              >
-                <Text className="text-sm text-blue-500 dark:text-blue-400 text-center">
-                  목표: {formatTargetTime(targetTime)} 
-                  <Text className="text-gray-400"> (탭하여 변경)</Text>
-                </Text>
-              </TouchableOpacity>
-              
-              {/* 시간 프리셋 선택 */}
-              {showTargetSettings && (
-                <View className="flex-row flex-wrap justify-center gap-2 mt-2">
-                  {timePresets.map((minutes) => (
-                    <TouchableOpacity
-                      key={minutes}
-                      onPress={() => handleTargetTimeChange(minutes)}
-                      className={`px-3 py-1 rounded-full border ${
-                        Math.round(targetTime / (60 * 1000)) === minutes
-                          ? 'bg-blue-500 border-blue-500'
-                          : 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600'
-                      }`}
-                    >
-                      <Text className={`text-xs ${
-                        Math.round(targetTime / (60 * 1000)) === minutes
-                          ? 'text-white'
-                          : 'text-gray-700 dark:text-gray-300'
-                      }`}>
-                        {minutes}분
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-          )}
-        </View>
-
+      
         <View ref={buttonLayoutRef}>
           <StartButton 
             glowIntensity={0.8}

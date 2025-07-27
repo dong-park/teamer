@@ -11,7 +11,6 @@ import Animated, {
   Extrapolate,
   SharedValue
 } from 'react-native-reanimated';
-import { BlurView } from '@react-native-community/blur';
 import { Preset } from '../types/preset';
 
 // PresetItem 컴포넌트
@@ -96,7 +95,6 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
   // 애니메이션 값들
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
-  const backgroundOpacity = useSharedValue(0);
   
   // 프리셋 원들의 애니메이션 값 (고정 6개)
   const presetAnimations = [
@@ -138,28 +136,59 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
     },
   ];
 
-  // 메뉴 중심에서 각 프리셋까지의 거리와 각도 계산
+  // 프리셋 개수에 따른 동적 배열 계산
+  const actualPresets = Math.min(presets.length, 6);
   const menuRadius = 120;
-  const angleStep = (2 * Math.PI) / Math.min(presets.length, 6);
   
-  const presetPositions = presets.slice(0, 6).map((_, index) => {
-    const angle = index * angleStep - Math.PI / 2; // -90도부터 시작 (12시 방향)
-    return {
-      x: Math.cos(angle) * menuRadius,
-      y: Math.sin(angle) * menuRadius,
-    };
-  });
+  // 프리셋 개수에 따라 배열 패턴 결정
+  const calculatePresetPositions = (count: number) => {
+    if (count === 1) {
+      // 1개: 위쪽에만
+      return [{ x: 0, y: -menuRadius }];
+    } else if (count === 2) {
+      // 2개: 위, 아래
+      return [
+        { x: 0, y: -menuRadius },
+        { x: 0, y: menuRadius }
+      ];
+    } else if (count === 3) {
+      // 3개: 위, 좌하, 우하 (삼각형)
+      return [
+        { x: 0, y: -menuRadius },
+        { x: -menuRadius * 0.866, y: menuRadius * 0.5 },
+        { x: menuRadius * 0.866, y: menuRadius * 0.5 }
+      ];
+    } else if (count === 4) {
+      // 4개: 십자 배열
+      return [
+        { x: 0, y: -menuRadius },
+        { x: menuRadius, y: 0 },
+        { x: 0, y: menuRadius },
+        { x: -menuRadius, y: 0 }
+      ];
+    } else {
+      // 5개 이상: 원형 배열
+      const angleStep = (2 * Math.PI) / count;
+      return Array.from({ length: count }, (_, index) => {
+        const angle = index * angleStep - Math.PI / 2; // -90도부터 시작 (12시 방향)
+        return {
+          x: Math.cos(angle) * menuRadius,
+          y: Math.sin(angle) * menuRadius,
+        };
+      });
+    }
+  };
+
+  const presetPositions = calculatePresetPositions(actualPresets);
 
   // 메뉴 표시/숨김 애니메이션
   useEffect(() => {
     if (isVisible) {
       // 메뉴 표시
-      backgroundOpacity.value = withTiming(1, { duration: 200 });
       scale.value = withSpring(1, { damping: 15, stiffness: 200 });
       opacity.value = withTiming(1, { duration: 300 });
       
       // 프리셋들을 순차적으로 애니메이션 (실제 프리셋 개수만큼)
-      const actualPresets = Math.min(presets.length, 6);
       for (let index = 0; index < actualPresets; index++) {
         const delay = index * 80; // 80ms 간격으로 순차 등장
         const position = presetPositions[index];
@@ -172,7 +201,6 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
       }
     } else {
       // 메뉴 숨김
-      backgroundOpacity.value = withTiming(0, { duration: 200 });
       scale.value = withSpring(0, { damping: 15, stiffness: 200 });
       opacity.value = withTiming(0, { duration: 200 });
       
@@ -184,12 +212,7 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
         anim.opacity.value = withTiming(0, { duration: 150 });
       });
     }
-  }, [isVisible]);
-
-  // 배경 애니메이션 스타일
-  const backgroundStyle = useAnimatedStyle(() => ({
-    opacity: backgroundOpacity.value,
-  }));
+  }, [isVisible, actualPresets]);
 
   // 메인 메뉴 애니메이션 스타일
   const menuStyle = useAnimatedStyle(() => ({
@@ -208,20 +231,13 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
   if (!isVisible) return null;
 
   return (
-    <View style={styles.overlay}>
-      {/* 배경 블러 */}
-      <Animated.View style={[styles.background, backgroundStyle]}>
-        <BlurView
-          style={styles.blurView}
-          blurType={isDarkMode ? 'dark' : 'light'}
-          blurAmount={10}
-        />
-        <TouchableOpacity 
-          style={styles.backgroundTouchable} 
-          onPress={onClose}
-          activeOpacity={1}
-        />
-      </Animated.View>
+    <View style={styles.overlay} pointerEvents="box-none">
+      {/* 배경 터치 영역 (프리셋 버튼들 사이의 빈 공간 클릭 시 닫기) */}
+      <TouchableOpacity 
+        style={styles.backgroundTouchable} 
+        onPress={onClose}
+        activeOpacity={1}
+      />
 
       {/* 메뉴 컨테이너 */}
       <Animated.View 
@@ -233,31 +249,22 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
             top: centerY - 150,  // 메뉴 크기의 절반만큼 위로
           }
         ]}
+        pointerEvents="box-none"
       >
-        {/* 중앙 원 */}
-        <View style={[
-          styles.centerCircle, 
-          isDarkMode ? styles.centerCircleDark : styles.centerCircleLight
-        ]}>
-          <Text style={[
-            styles.centerText,
-            isDarkMode ? styles.centerTextDark : styles.centerTextLight
-          ]}>
-            할일 선택
-          </Text>
-        </View>
-
-        {/* 프리셋 원들 */}
+        {/* 프리셋 원들만 표시 (중앙 원 제거) */}
         {presets.slice(0, 6).map((preset, index) => (
-          <PresetItem
-            key={preset.id}
-            preset={preset}
-            animation={presetAnimations[index]}
-            isDarkMode={isDarkMode}
-            onSelect={handleSelectPreset}
-          />
+          index < actualPresets ? (
+            <PresetItem
+              key={preset.id}
+              preset={preset}
+              animation={presetAnimations[index]}
+              isDarkMode={isDarkMode}
+              onSelect={handleSelectPreset}
+            />
+          ) : null
         ))}
       </Animated.View>
+
     </View>
   );
 };
@@ -271,18 +278,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 1000,
   },
-  background: {
-    flex: 1,
-  },
-  blurView: {
+  backgroundTouchable: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-  },
-  backgroundTouchable: {
-    flex: 1,
   },
   menuContainer: {
     position: 'absolute',
@@ -291,44 +292,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  centerCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    borderWidth: 2,
-  },
-  centerCircleLight: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  centerCircleDark: {
-    backgroundColor: 'rgba(40, 40, 40, 0.9)',
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  centerText: {
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  centerTextLight: {
-    color: '#1f2937',
-  },
-  centerTextDark: {
-    color: '#f9fafb',
-  },
+
   presetWrapper: {
     position: 'absolute',
   },
@@ -342,22 +306,22 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   presetCircleLight: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderColor: 'rgba(0, 0, 0, 0.1)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 6,
   },
   presetCircleDark: {
-    backgroundColor: 'rgba(30, 30, 30, 0.95)',
+    backgroundColor: 'rgba(30, 30, 30, 0.98)',
     borderColor: 'rgba(255, 255, 255, 0.2)',
     shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 6,
   },
   colorIndicator: {
     width: 16,
