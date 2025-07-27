@@ -190,11 +190,24 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Remove Timer Display Elements from Main Screen While Preserving Timer Logic",
+        "description": "Remove time display and achievement rate indicators from the main screen UI while maintaining all underlying timer mechanisms and functionality intact.",
+        "details": "This task focuses on selectively removing UI elements related to timer display without affecting the core timer logic:\n\n1. **Identify Timer Display Components**:\n   - Locate current time display elements in HomeScreen or main component\n   - Identify achievement rate percentage displays\n   - Map out which UI components show timer-related information\n\n2. **Remove UI Elements Only**:\n   - Comment out or remove JSX elements that display current time\n   - Remove achievement rate percentage text/indicators from render\n   - Hide any progress bars or visual indicators of timer progress\n   - Ensure no timer-related text appears in the main screen UI\n\n3. **Preserve Timer Logic**:\n   - Keep all useTimer hooks and timer context intact\n   - Maintain timer state management and calculations\n   - Preserve target time settings and achievement calculations\n   - Keep all timer-related functions and event handlers\n   - Ensure timer continues running in background without UI feedback\n\n4. **Verify Logic Preservation**:\n   - Test that timer still starts/stops/resets functionally\n   - Confirm achievement calculations continue working\n   - Verify timer state is maintained correctly\n   - Ensure target time functionality remains operational",
+        "testStrategy": "1. **Visual Verification**: Confirm main screen no longer displays any time-related information or achievement percentages. Verify UI is clean without timer indicators.\n\n2. **Functional Testing**: Start timer and verify it runs in background without visual feedback. Test timer controls (start/stop/reset) still work properly through any remaining controls.\n\n3. **State Verification**: Use React DevTools or console logging to verify timer state, achievement calculations, and target time logic continue functioning correctly.\n\n4. **Integration Testing**: Verify ambient glow effects and other timer-dependent features still respond to timer state changes even without UI display.\n\n5. **Cross-Platform Testing**: Test on both iOS and Android to ensure timer logic preservation works across platforms.",
+        "status": "done",
+        "dependencies": [
+          11
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-07-20T02:25:49.784Z",
-      "updated": "2025-07-27T01:34:36.272Z",
+      "updated": "2025-07-27T01:47:03.593Z",
       "description": "Tasks for master context"
     }
   }

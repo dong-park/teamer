@@ -67,41 +67,8 @@ const HomeScreen: React.FC = () => {
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
       >
-        {/* 타이머 상태 표시 영역 */}
+        {/* 목표 시간 설정만 유지 */}
         <View className="mb-8 items-center">
-          {/* 경과 시간 표시 */}
-          <Text className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
-            {formatElapsedTime(elapsedTime)}
-          </Text>
-          
-          {/* 상태 표시 */}
-          <View className="flex-row items-center mb-2">
-            <View 
-              className={`w-3 h-3 rounded-full mr-2 ${
-                isRunning ? 'bg-green-500' : 'bg-gray-400'
-              }`} 
-            />
-            <Text className="text-lg text-gray-600 dark:text-gray-300">
-              {isRunning ? '실행 중' : '대기 중'}
-            </Text>
-          </View>
-          
-          {/* 시작 시간 표시 */}
-          {startTime && (
-            <Text className="text-sm text-gray-500 dark:text-gray-400">
-              시작 시간: {formatStartTime(startTime)}
-            </Text>
-          )}
-          
-          {/* 달성률 표시 */}
-          {isRunning && (
-            <Text className="text-xs text-blue-500 dark:text-blue-400 mt-1">
-              달성률: {Math.round(achievementRate * 100)}% 
-              <Text className="text-gray-400"> (glow: {dynamicGlowRadius.toFixed(1)})</Text>
-            </Text>
-          )}
-          
-          {/* 목표 시간 설정 */}
           {!isRunning && (
             <View className="mt-3">
               <TouchableOpacity 
