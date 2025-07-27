@@ -96,8 +96,20 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
   
-  // 프리셋 원들의 애니메이션 값 (고정 6개)
+  // 프리셋 원들의 애니메이션 값 (고정 8개)
   const presetAnimations = [
+    {
+      scale: useSharedValue(0),
+      translateX: useSharedValue(0),
+      translateY: useSharedValue(0),
+      opacity: useSharedValue(0),
+    },
+    {
+      scale: useSharedValue(0),
+      translateX: useSharedValue(0),
+      translateY: useSharedValue(0),
+      opacity: useSharedValue(0),
+    },
     {
       scale: useSharedValue(0),
       translateX: useSharedValue(0),
@@ -137,7 +149,7 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
   ];
 
   // 프리셋 개수에 따른 동적 배열 계산
-  const actualPresets = Math.min(presets.length, 6);
+  const actualPresets = Math.min(presets.length, 8);
   const menuRadius = 120;
   
   // 프리셋 개수에 따라 배열 패턴 결정
@@ -188,16 +200,15 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
       scale.value = withSpring(1, { damping: 15, stiffness: 200 });
       opacity.value = withTiming(1, { duration: 300 });
       
-      // 프리셋들을 순차적으로 애니메이션 (실제 프리셋 개수만큼)
+      // 프리셋들을 동시에 애니메이션 (실제 프리셋 개수만큼)
       for (let index = 0; index < actualPresets; index++) {
-        const delay = index * 80; // 80ms 간격으로 순차 등장
         const position = presetPositions[index];
         const anim = presetAnimations[index];
         
-        anim.scale.value = withDelay(delay, withSpring(1, { damping: 12, stiffness: 150 }));
-        anim.translateX.value = withDelay(delay, withSpring(position.x, { damping: 15, stiffness: 120 }));
-        anim.translateY.value = withDelay(delay, withSpring(position.y, { damping: 15, stiffness: 120 }));
-        anim.opacity.value = withDelay(delay, withTiming(1, { duration: 200 }));
+        anim.scale.value = withSpring(1, { damping: 12, stiffness: 150 });
+        anim.translateX.value = withSpring(position.x, { damping: 15, stiffness: 120 });
+        anim.translateY.value = withSpring(position.y, { damping: 15, stiffness: 120 });
+        anim.opacity.value = withTiming(1, { duration: 200 });
       }
     } else {
       // 메뉴 숨김
@@ -252,7 +263,7 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
         pointerEvents="box-none"
       >
         {/* 프리셋 원들만 표시 (중앙 원 제거) */}
-        {presets.slice(0, 6).map((preset, index) => (
+        {presets.slice(0, 8).map((preset, index) => (
           index < actualPresets ? (
             <PresetItem
               key={preset.id}

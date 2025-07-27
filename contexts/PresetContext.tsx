@@ -15,7 +15,7 @@ interface PresetContextType {
 const PresetContext = createContext<PresetContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'teamer_presets';
-const MAX_RECENT_PRESETS = 6;
+const MAX_RECENT_PRESETS = 8;
 
 // 기본 샘플 프리셋들
 const defaultPresets: Preset[] = [
@@ -57,7 +57,7 @@ const defaultPresets: Preset[] = [
   },
   {
     id: '4',
-    name: '창작',
+    name: '창작2',
     todos: [
       { id: '4-1', title: '아이디어 정리', color: '#EC4899', duration: 15 },
       { id: '4-2', title: '글쓰기', color: '#6366F1', duration: 25 },
@@ -67,6 +67,54 @@ const defaultPresets: Preset[] = [
     lastUsed: new Date('2024-01-12'),
     usageCount: 5,
   },
+  {
+    id: '5',
+    name: '요리',
+    todos: [
+      { id: '5-1', title: '재료 준비', color: '#F59E0B', duration: 15 },
+      { id: '5-2', title: '조리', color: '#DC2626', duration: 30 },
+      { id: '5-3', title: '마무리', color: '#059669', duration: 10 },
+    ],
+    createdAt: new Date('2024-01-05'),
+    lastUsed: new Date('2024-01-11'),
+    usageCount: 7,
+  },
+  // {
+  //   id: '6',
+  //   name: '청소',
+  //   todos: [
+  //     { id: '6-1', title: '정리', color: '#7C3AED', duration: 20 },
+  //     { id: '6-2', title: '물걸레질', color: '#0EA5E9', duration: 25 },
+  //     { id: '6-3', title: '마무리', color: '#22C55E', duration: 10 },
+  //   ],
+  //   createdAt: new Date('2024-01-06'),
+  //   lastUsed: new Date('2024-01-10'),
+  //   usageCount: 4,
+  // },
+  // {
+  //   id: '7',
+  //   name: '회의',
+  //   todos: [
+  //     { id: '7-1', title: '자료 준비', color: '#0891B2', duration: 15 },
+  //     { id: '7-2', title: '회의 진행', color: '#DC2626', duration: 45 },
+  //     { id: '7-3', title: '정리', color: '#16A34A', duration: 15 },
+  //   ],
+  //   createdAt: new Date('2024-01-07'),
+  //   lastUsed: new Date('2024-01-09'),
+  //   usageCount: 3,
+  // },
+  // {
+  //   id: '8',
+  //   name: '명상',
+  //   todos: [
+  //     { id: '8-1', title: '호흡 준비', color: '#A855F7', duration: 5 },
+  //     { id: '8-2', title: '명상', color: '#6366F1', duration: 20 },
+  //     { id: '8-3', title: '마무리', color: '#10B981', duration: 5 },
+  //   ],
+  //   createdAt: new Date('2024-01-08'),
+  //   lastUsed: new Date('2024-01-08'),
+  //   usageCount: 2,
+  // },
 ];
 
 export const PresetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -80,15 +128,16 @@ export const PresetProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const loadPresets = useCallback(async () => {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsedPresets = JSON.parse(stored);
-        setPresets(parsedPresets);
-        updateRecentPresets(parsedPresets);
-      } else {
-        // 기본 프리셋 저장
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(defaultPresets));
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(defaultPresets));
         updateRecentPresets(defaultPresets);
-      }
+      // if (stored) {
+      //   const parsedPresets = JSON.parse(stored);
+      //   setPresets(parsedPresets);
+      //   updateRecentPresets(parsedPresets);
+      // } else {
+      //   // 기본 프리셋 저장
+        
+      // }
     } catch (error) {
       console.error('프리셋 로드 실패:', error);
       updateRecentPresets(defaultPresets);
