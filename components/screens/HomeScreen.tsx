@@ -3,12 +3,13 @@ import { View, ScrollView, Text, StyleSheet, TouchableOpacity, Dimensions, useCo
 import StartButton from '../StartButton';
 import PresetMenu from '../PresetMenu';
 import PresetManagementScreen from './PresetManagementScreen';
+import SuccessCounter from '../SuccessCounter';
 import { useTimer } from '../../App';
 import { usePreset } from '../../contexts/PresetContext';
 import { Preset } from '../../types/preset';
 
 const HomeScreen: React.FC = () => {
-  const { isRunning, startTimer, stopTimer, elapsedTime, startTime, achievementRate, targetTime, setTargetTime } = useTimer();
+  const { isRunning, startTimer, stopTimer, elapsedTime, startTime, achievementRate, targetTime, setTargetTime, completedTasksCount } = useTimer();
   const { currentPreset, presetMenuState, showPresetMenu, hidePresetMenu, selectPreset, setCurrentPreset, getRecentPresets, updatePresetUsage } = usePreset();
   const [showTargetSettings, setShowTargetSettings] = useState(false);
   const [showPresetManagement, setShowPresetManagement] = useState(false);
@@ -168,6 +169,9 @@ const HomeScreen: React.FC = () => {
           <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
             ColorPreset: {currentPreset ? 'custom' : 'electric'}
           </Text>
+          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+            성공 카운트: {completedTasksCount}
+          </Text>
           {currentPreset && (
             <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
               CustomColors: {JSON.stringify({
@@ -214,6 +218,9 @@ const HomeScreen: React.FC = () => {
             )}
           </View>
         )}
+
+        {/* 성공 카운트 표시 */}
+        <SuccessCounter count={completedTasksCount} />
       
         <View ref={buttonLayoutRef}>
           <StartButton 
