@@ -151,6 +151,7 @@ global.css                          # Tailwind CSS global configuration
 @./.taskmaster/CLAUDE.md
 
 ## Testing Approach
+
 - **Unit Tests**: Jest tests for ambient effect system, hooks, and utilities
   - `__tests__/AmbientEffect.test.ts` - Particle system, device detection, performance monitoring
   - `__tests__/hooks/useAdaptiveConfig.test.ts` - Adaptive configuration logic
@@ -160,6 +161,7 @@ global.css                          # Tailwind CSS global configuration
 - **Cross-Platform**: iOS and Android validation for all features
 
 ## Key Development Patterns
+
 - **Context Providers**: Wrap app components for global state (Timer, Preset)
 - **Adaptive Hooks**: Use device capability detection for optimal performance
 - **Skia Effects**: Leverage `@shopify/react-native-skia` for complex visual effects
@@ -167,6 +169,7 @@ global.css                          # Tailwind CSS global configuration
 - **Performance First**: Always consider mobile device limitations and optimize accordingly
 
 ## Common Development Tasks
+
 - **Adding New Presets**: Update `contexts/PresetContext.tsx` and `types/preset.ts`
 - **Modifying Ambient Effects**: Work in `components/AmbientEffect/` modular system
 - **Timer Logic Changes**: Modify `hooks/useTimer.ts` for timer functionality

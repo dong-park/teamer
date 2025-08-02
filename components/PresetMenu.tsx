@@ -40,8 +40,8 @@ const PresetItem: React.FC<PresetItemProps> = ({ preset, animation, isDarkMode, 
     <Animated.View style={[styles.presetWrapper, presetStyle]}>
       <TouchableOpacity
         style={[
-          styles.presetCircle,
-          isDarkMode ? styles.presetCircleDark : styles.presetCircleLight,
+          styles.presetSquare,
+          isDarkMode ? styles.presetSquareDark : styles.presetSquareLight,
         ]}
         onPress={() => onSelect(preset)}
         activeOpacity={0.8}
@@ -64,12 +64,6 @@ const PresetItem: React.FC<PresetItemProps> = ({ preset, animation, isDarkMode, 
           isDarkMode ? styles.presetTextDark : styles.presetTextLight
         ]}>
           {preset.name}
-        </Text>
-        <Text style={[
-          styles.presetCount,
-          isDarkMode ? styles.presetCountDark : styles.presetCountLight
-        ]}>
-          {preset.todos.length}개
         </Text>
       </TouchableOpacity>
     </Animated.View>
@@ -313,53 +307,53 @@ const styles = StyleSheet.create({
   presetWrapper: {
     position: 'absolute',
   },
-  presetCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+  presetSquare: {
+    width: 60,
+    height: 60,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 1,
     position: 'relative',
   },
-  presetCircleLight: {
-    backgroundColor: 'rgba(255, 255, 255, 0.98)',
-    borderColor: 'rgba(0, 0, 0, 0.1)',
+  presetSquareLight: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderColor: 'rgba(0, 0, 0, 0.08)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
-  presetCircleDark: {
-    backgroundColor: 'rgba(30, 30, 30, 0.98)',
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+  presetSquareDark: {
+    backgroundColor: 'rgba(30, 30, 30, 0.95)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
   colorIndicator: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: 6,
+    right: 6,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.5)',
   },
   emojiText: {
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  presetText: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 20,
     textAlign: 'center',
     marginBottom: 2,
+  },
+  presetText: {
+    fontSize: 10,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 2,
   },
   presetTextLight: {
     color: '#374151',

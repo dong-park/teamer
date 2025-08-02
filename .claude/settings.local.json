@@ -25,7 +25,9 @@
       "mcp__serena__summarize_changes",
       "mcp__taskmaster-ai__get_tasks",
       "mcp__taskmaster-ai__add_task",
-      "mcp__taskmaster-ai__set_task_status"
+      "mcp__taskmaster-ai__set_task_status",
+      "Bash(npm run lint:*)",
+      "Bash(npm test:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

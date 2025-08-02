@@ -13,6 +13,7 @@ const HomeScreen: React.FC = () => {
   const { currentPreset, presetMenuState, showPresetMenu, hidePresetMenu, selectPreset, setCurrentPreset, getRecentPresets, updatePresetUsage } = usePreset();
   const [showTargetSettings, setShowTargetSettings] = useState(false);
   const [showPresetManagement, setShowPresetManagement] = useState(false);
+  const [showDebugInfo, setShowDebugInfo] = useState(false);
   const buttonLayoutRef = useRef<View>(null);
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
   const isDarkMode = useColorScheme() === 'dark';
@@ -123,13 +124,21 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View className="flex-1">
-      {/* 프리셋 관리 버튼 */}
-      <View style={styles.headerContainer}>
+      {/* 플로팅 버튼들 */}
+      <View style={styles.floatingButtonContainer}>
         <TouchableOpacity
-          style={[styles.presetManagementButton, { backgroundColor: isDarkMode ? '#4a5568' : '#ffffff' }]}
+          style={[styles.floatingButton, { backgroundColor: isDarkMode ? '#4a5568' : '#ffffff' }]}
+          onPress={() => setShowDebugInfo(!showDebugInfo)}
+        >
+          <Text style={[styles.floatingButtonText, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
+            🐛
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.floatingButton, { backgroundColor: isDarkMode ? '#4a5568' : '#ffffff' }]}
           onPress={() => setShowPresetManagement(true)}
         >
-          <Text style={[styles.presetManagementButtonText, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
+          <Text style={[styles.floatingButtonText, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
             ⚙️
           </Text>
         </TouchableOpacity>
@@ -139,60 +148,66 @@ const HomeScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContainer}
       >
         {/* 디버깅 정보 표시 */}
-        <View style={[styles.debugContainer, { backgroundColor: isDarkMode ? '#1a202c' : '#f7fafc' }]}>
-          <Text style={[styles.debugTitle, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
-            디버깅 정보
-          </Text>
-          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-            목표 시간: {formatTargetTime(targetTime)}
-          </Text>
-          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-            경과 시간: {formatElapsedTime(elapsedTime)}
-          </Text>
-          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-            달성률: {(achievementRate * 100).toFixed(1)}%
-          </Text>
-          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-            타이머 상태: {isRunning ? '실행 중' : '정지'}
-          </Text>
-          {startTime && (
-            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-              시작 시간: {formatStartTime(startTime)}
+        {showDebugInfo && (
+          <View style={[styles.debugContainer, { backgroundColor: isDarkMode ? '#1a202c' : '#f7fafc' }]}>
+            <Text style={[styles.debugTitle, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
+              디버깅 정보
             </Text>
-          )}
-          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-            Glow Radius: {dynamicGlowRadius.toFixed(2)}
-          </Text>
-          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-            현재 프리셋 색상: {currentPreset?.color || '없음'}
-          </Text>
-          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-            ColorPreset: {currentPreset ? 'custom' : 'electric'}
-          </Text>
-          <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-            성공 카운트: {completedTasksCount}
-          </Text>
-          {currentPreset && (
             <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
-              CustomColors: {JSON.stringify({
-                primary: currentPreset.color,
-                secondary: currentPreset.color,
-                accent: currentPreset.color
-              })}
+              목표 시간: {formatTargetTime(targetTime)}
             </Text>
-          )}
-        </View>
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              경과 시간: {formatElapsedTime(elapsedTime)}
+            </Text>
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              달성률: {(achievementRate * 100).toFixed(1)}%
+            </Text>
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              타이머 상태: {isRunning ? '실행 중' : '정지'}
+            </Text>
+            {startTime && (
+              <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+                시작 시간: {formatStartTime(startTime)}
+              </Text>
+            )}
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              Glow Radius: {dynamicGlowRadius.toFixed(2)}
+            </Text>
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              현재 프리셋 색상: {currentPreset?.color || '없음'}
+            </Text>
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              ColorPreset: {currentPreset ? 'custom' : 'electric'}
+            </Text>
+            <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+              성공 카운트: {completedTasksCount}
+            </Text>
+            {currentPreset && (
+              <Text style={[styles.debugText, { color: isDarkMode ? '#a0aec0' : '#4a5568' }]}>
+                CustomColors: {JSON.stringify({
+                  primary: currentPreset.color,
+                  secondary: currentPreset.color,
+                  accent: currentPreset.color
+                })}
+              </Text>
+            )}
+          </View>
+        )}
 
         {/* 현재 프리셋 표시 */}
         {currentPreset && (
           <View style={[styles.currentPresetContainer, { backgroundColor: isDarkMode ? '#2d3748' : '#ffffff' }]}>
-            <Text style={[styles.currentPresetLabel, { color: isDarkMode ? '#a0aec0' : '#718096' }]}>
-              현재 프리셋
-            </Text>
             <View style={styles.currentPresetInfo}>
-              <View style={[styles.currentPresetColor, { backgroundColor: currentPreset.color }]} />
+              {currentPreset.emoji ? (
+                <Text style={styles.currentPresetEmoji}>{currentPreset.emoji}</Text>
+              ) : (
+                <View style={[styles.currentPresetColor, { backgroundColor: currentPreset.color }]} />
+              )}
               <Text style={[styles.currentPresetName, { color: isDarkMode ? '#ffffff' : '#000000' }]}>
                 {currentPreset.name}
+              </Text>
+              <Text style={[styles.currentPresetTime, { color: isDarkMode ? '#a0aec0' : '#718096' }]}>
+                {currentPreset.targetTime}분
               </Text>
               <TouchableOpacity 
                 onPress={() => setCurrentPreset(null)}
@@ -201,21 +216,6 @@ const HomeScreen: React.FC = () => {
                 <Text style={[styles.clearPresetButtonText, { color: isDarkMode ? '#a0aec0' : '#718096' }]}>✕</Text>
               </TouchableOpacity>
             </View>
-            <Text style={[styles.presetTargetTime, { color: isDarkMode ? '#e2e8f0' : '#4a5568' }]}>
-              목표 시간: {currentPreset.targetTime}분
-            </Text>
-            {currentPreset.todos.length > 0 && (
-              <View style={styles.currentPresetTodos}>
-                {currentPreset.todos.map((todo, index) => (
-                  <View key={todo.id} style={styles.currentTodoItem}>
-                    <View style={[styles.todoColorDot, { backgroundColor: todo.color }]} />
-                    <Text style={[styles.todoTitle, { color: isDarkMode ? '#e2e8f0' : '#4a5568' }]}>
-                      {todo.title}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
           </View>
         )}
 
@@ -252,13 +252,14 @@ const HomeScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
+  floatingButtonContainer: {
     position: 'absolute',
-    top: 50,
+    bottom: 30,
     right: 20,
     zIndex: 10,
+    gap: 10,
   },
-  presetManagementButton: {
+  floatingButton: {
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  presetManagementButtonText: {
+  floatingButtonText: {
     fontSize: 20,
   },
   scrollContainer: {
@@ -303,38 +304,39 @@ const styles = StyleSheet.create({
   currentPresetContainer: {
     width: '100%',
     maxWidth: 350,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 30,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  currentPresetLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 12,
-    textAlign: 'center',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   currentPresetInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
+    justifyContent: 'space-between',
+  },
+  currentPresetEmoji: {
+    fontSize: 18,
+    marginRight: 12,
   },
   currentPresetColor: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    marginRight: 10,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 12,
   },
   currentPresetName: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
     flex: 1,
-    textAlign: 'center',
+  },
+  currentPresetTime: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginRight: 8,
   },
   clearPresetButton: {
     width: 24,
