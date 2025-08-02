@@ -25,6 +25,7 @@ const PresetManagementScreen: React.FC<PresetManagementScreenProps> = ({ onClose
   const isDarkMode = useColorScheme() === 'dark';
 
   const [newPresetName, setNewPresetName] = useState('');
+  const [newPresetEmoji, setNewPresetEmoji] = useState('');
   const [newPresetColor, setNewPresetColor] = useState('#3B82F6');
   const [newPresetTargetTime, setNewPresetTargetTime] = useState(30);
   const [newPresetTodos, setNewPresetTodos] = useState<TodoItem[]>([
@@ -32,6 +33,7 @@ const PresetManagementScreen: React.FC<PresetManagementScreenProps> = ({ onClose
   ]);
 
   const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
+  const emojis = ['💻', '📚', '🏋️', '✍️', '🍳', '🎨', '🧘', '🎵', '🎮', '📱', '💡', '🔬', '🌱', '🚀', '⚡', '🎯', '📊', '🔥', '💪', '🌟'];
 
   const handleAddTodo = () => {
     const newTodo: TodoItem = {
@@ -74,6 +76,7 @@ const PresetManagementScreen: React.FC<PresetManagementScreenProps> = ({ onClose
     const preset: Preset = {
       id: editingPreset?.id || Date.now().toString(),
       name: newPresetName,
+      emoji: newPresetEmoji || undefined,
       color: newPresetColor,
       targetTime: newPresetTargetTime,
       todos: validTodos,
@@ -87,6 +90,7 @@ const PresetManagementScreen: React.FC<PresetManagementScreenProps> = ({ onClose
     } else {
       addPreset({
         name: preset.name,
+        emoji: preset.emoji,
         color: preset.color,
         targetTime: preset.targetTime,
         todos: preset.todos,
@@ -99,6 +103,7 @@ const PresetManagementScreen: React.FC<PresetManagementScreenProps> = ({ onClose
   const handleEditPreset = (preset: Preset) => {
     setEditingPreset(preset);
     setNewPresetName(preset.name);
+    setNewPresetEmoji(preset.emoji || '');
     setNewPresetColor(preset.color);
     setNewPresetTargetTime(preset.targetTime);
     setNewPresetTodos([...preset.todos]);
@@ -120,6 +125,7 @@ const PresetManagementScreen: React.FC<PresetManagementScreenProps> = ({ onClose
     setShowAddModal(false);
     setEditingPreset(null);
     setNewPresetName('');
+    setNewPresetEmoji('');
     setNewPresetColor('#3B82F6');
     setNewPresetTargetTime(30);
     setNewPresetTodos([{ id: '1', title: '', color: '#3B82F6' }]);
@@ -149,7 +155,11 @@ const PresetManagementScreen: React.FC<PresetManagementScreenProps> = ({ onClose
           <View key={preset.id} style={[styles.presetCard, { backgroundColor: cardBackgroundColor }]}>
             <View style={styles.presetHeader}>
               <View style={styles.presetInfo}>
-                <View style={[styles.colorIndicator, { backgroundColor: preset.color }]} />
+                {preset.emoji ? (
+                  <Text style={styles.presetEmoji}>{preset.emoji}</Text>
+                ) : (
+                  <View style={[styles.colorIndicator, { backgroundColor: preset.color }]} />
+                )}
                 <Text style={[styles.presetName, { color: textColor }]}>{preset.name}</Text>
               </View>
               <View style={styles.presetActions}>
@@ -201,6 +211,34 @@ const PresetManagementScreen: React.FC<PresetManagementScreenProps> = ({ onClose
                 placeholder="프리셋 이름을 입력하세요"
                 placeholderTextColor={secondaryTextColor}
               />
+
+              {/* 프리셋 이모지 선택 */}
+              <Text style={[styles.label, { color: textColor }]}>프리셋 이모지 (선택사항)</Text>
+              <View style={styles.emojiPicker}>
+                <TouchableOpacity
+                  style={[
+                    styles.emojiOption,
+                    !newPresetEmoji && styles.selectedEmoji,
+                    { borderColor: isDarkMode ? '#4a5568' : '#e2e8f0' }
+                  ]}
+                  onPress={() => setNewPresetEmoji('')}
+                >
+                  <Text style={[styles.emojiText, { color: textColor, fontSize: 12 }]}>없음</Text>
+                </TouchableOpacity>
+                {emojis.map((emoji) => (
+                  <TouchableOpacity
+                    key={emoji}
+                    style={[
+                      styles.emojiOption,
+                      newPresetEmoji === emoji && styles.selectedEmoji,
+                      { borderColor: isDarkMode ? '#4a5568' : '#e2e8f0' }
+                    ]}
+                    onPress={() => setNewPresetEmoji(emoji)}
+                  >
+                    <Text style={styles.emojiText}>{emoji}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
 
               {/* 프리셋 색상 선택 */}
               <Text style={[styles.label, { color: textColor }]}>프리셋 색상</Text>
@@ -363,6 +401,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     flex: 1,
   },
+  presetEmoji: {
+    fontSize: 20,
+    width: 32,
+    textAlign: 'center',
+    marginRight: 12,
+  },
   presetActions: {
     flexDirection: 'row',
   },
@@ -403,6 +447,30 @@ const styles = StyleSheet.create({
   },
   selectedColor: {
     borderColor: '#000',
+  },
+  emojiPicker: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  emojiOption: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+  selectedEmoji: {
+    borderColor: '#3B82F6',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+  },
+  emojiText: {
+    fontSize: 20,
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,

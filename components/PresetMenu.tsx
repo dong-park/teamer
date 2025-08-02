@@ -46,13 +46,19 @@ const PresetItem: React.FC<PresetItemProps> = ({ preset, animation, isDarkMode, 
         onPress={() => onSelect(preset)}
         activeOpacity={0.8}
       >
-        {/* 프리셋 색상 표시 */}
-        <View 
-          style={[
-            styles.colorIndicator,
-            { backgroundColor: preset.todos[0]?.color || '#3B82F6' }
-          ]} 
-        />
+        {/* 프리셋 이모지 또는 색상 표시 */}
+        {preset.emoji ? (
+          <Text style={styles.emojiText}>
+            {preset.emoji}
+          </Text>
+        ) : (
+          <View 
+            style={[
+              styles.colorIndicator,
+              { backgroundColor: preset.todos[0]?.color || '#3B82F6' }
+            ]} 
+          />
+        )}
         <Text style={[
           styles.presetText,
           isDarkMode ? styles.presetTextDark : styles.presetTextLight
@@ -343,6 +349,11 @@ const styles = StyleSheet.create({
     right: 8,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  emojiText: {
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 4,
   },
   presetText: {
     fontSize: 11,

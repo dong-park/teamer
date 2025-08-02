@@ -27,6 +27,7 @@ const defaultPresets: Preset[] = [
   {
     id: '1',
     name: '개발 작업',
+    emoji: '💻',
     color: '#3B82F6',
     targetTime: 1,
     todos: [
@@ -41,6 +42,7 @@ const defaultPresets: Preset[] = [
   {
     id: '2',
     name: '공부',
+    emoji: '📚',
     color: '#8B5CF6',
     targetTime: 45,
     todos: [
@@ -55,6 +57,7 @@ const defaultPresets: Preset[] = [
   {
     id: '3',
     name: '운동',
+    emoji: '🏋️',
     color: '#EF4444',
     targetTime: 30,
     todos: [
@@ -69,6 +72,7 @@ const defaultPresets: Preset[] = [
   {
     id: '4',
     name: '창작2',
+    emoji: '✍️',
     color: '#EC4899',
     targetTime: 50,
     todos: [
@@ -83,6 +87,7 @@ const defaultPresets: Preset[] = [
   {
     id: '5',
     name: '요리',
+    emoji: '🍳',
     color: '#F59E0B',
     targetTime: 40,
     todos: [

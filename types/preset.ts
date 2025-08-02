@@ -11,6 +11,7 @@ export interface TodoItem {
 export interface Preset {
   id: string;
   name: string;
+  emoji?: string; // 프리셋을 나타내는 이모지 (선택적)
   color: string; // 프리셋 대표 색상 (앰비언트 라이트에 사용)
   targetTime: number; // 전체 목표 시간 (분 단위)
   todos: TodoItem[];
